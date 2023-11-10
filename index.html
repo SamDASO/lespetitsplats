@@ -2,11 +2,49 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Les petits plats</title>
+    <link rel="stylesheet" href="src/style.css" />
   </head>
   <body>
+    <header id="header">
+      <div id="logo">
+        <img
+          class="logo-text"
+          src="assets/images/logo-text.png.png"
+          alt="logo"
+        />
+        <img
+          class="logo-dot"
+          src="assets/images/logo-dot.png.png"
+          aria-hidden="true"
+        />
+      </div>
+      <h1 id="catchphrase">
+        CHERCHEZ PARMI PLUS DE 1500 RECETTES DU QUOTIDIEN,SIMPLES ET DÉLICIEUSES
+      </h1>
+      <section id="search-bar"></section>
+    </header>
+    <main>
+      <section id="tags">
+        <div id="filters-container">
+          <select name="ingredients" id="ingredients-btn" class="filters">
+            <span id="ingredients">Ingrédients</span>
+            <!--option value=-->
+          </select>
+          <select name="devices" id="devices-btn" class="filters">
+            <span id="devices">Appareils</span>
+            <!--option value=-->
+          </select>
+          <select name="utensils" id="utensils-btn" class="filters">
+            <span id="utensils">Ustenciles</span>
+            <!--option value=-->
+          </select>
+        </div>
+        <p id="nbr-recipes">1500 recettes</p>
+      </section>
+      <section id="recipies"></section>
+    </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
