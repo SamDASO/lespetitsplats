@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Les petits plats</title>
     <link rel="stylesheet" href="src/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <header id="header">
@@ -23,7 +35,35 @@
       <h1 id="catchphrase">
         CHERCHEZ PARMI PLUS DE 1500 RECETTES DU QUOTIDIEN,SIMPLES ET DÉLICIEUSES
       </h1>
-      <section id="search-bar"></section>
+      <section id="search-bar">
+        <form id="search-form">
+          <input
+            type="text"
+            id="search-input"
+            name="search"
+            placeholder="Rechercher une recette, un ingrédient, ..."
+          />
+          <button id="search-btn">
+            <svg
+              id="search-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="28"
+              height="28"
+              viewBox="0 0 28 28"
+              fill="none"
+            >
+              <circle cx="10" cy="10" r="9.5" stroke="white" />
+              <line
+                x1="18.3536"
+                y1="18.6464"
+                x2="27.3536"
+                y2="27.6464"
+                stroke="white"
+              />
+            </svg>
+          </button>
+        </form>
+      </section>
     </header>
     <main>
       <section id="tags">
