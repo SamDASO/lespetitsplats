@@ -67,20 +67,102 @@
     </header>
     <main>
       <section id="tags">
-        <div id="filters-container">
-          <select name="ingredients" id="ingredients-btn" class="filters">
-            <span id="ingredients">Ingrédients</span>
-            <!--option value=-->
-          </select>
-          <select name="devices" id="devices-btn" class="filters">
-            <span id="devices">Appareils</span>
-            <!--option value=-->
-          </select>
-          <select name="utensils" id="utensils-btn" class="filters">
-            <span id="utensils">Ustenciles</span>
-            <!--option value=-->
-          </select>
+        <div class="filter-container">
+          <button
+            id="ingredients-btn"
+            class="filters-btn"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="sort-option-container"
+            role="button"
+          >
+            Ingrédients
+            <div id="sort-arrow" class="arrow-down" aria-hidden="true"></div>
+          </button>
+
+          <div class="dropdown-content dropdown-ingredients display-none">
+            <form class="dropdown-search-ingredients">
+              <input
+                type="text"
+                id="search-ingredients"
+                name="search"
+                placeholder=""
+              />
+              <button id="search-ingredients-btn">
+                <img
+                  src="./assets/icons/search-filter.svg"
+                  alt="search button"
+                />
+              </button>
+            </form>
+            <!-- options here -->
+          </div>
         </div>
+
+        <div class="filter-container">
+          <button
+            id="devices-btn"
+            class="filters-btn"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="sort-option-container"
+            role="button"
+          >
+            Appareils
+            <div id="sort-arrow" class="arrow-down" aria-hidden="true"></div>
+          </button>
+
+          <div class="dropdown-content dropdown-devices display-none">
+            <form class="dropdown-search-ingredient">
+              <input
+                type="text"
+                id="search-devices"
+                name="search"
+                placeholder=""
+              />
+              <button id="search-devices-btn">
+                <img
+                  src="./assets/icons/search-filter.svg"
+                  alt="search button"
+                />
+              </button>
+            </form>
+            <!-- options here -->
+          </div>
+        </div>
+
+        <div class="filter-container">
+          <button
+            id="utensils-btn"
+            class="filters-btn"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="sort-option-container"
+            role="button"
+          >
+            Ustensiles
+            <div id="sort-arrow" class="arrow-down" aria-hidden="true"></div>
+          </button>
+
+          <div class="dropdown-content dropdown-utensils display-none">
+            <form class="dropdown-search-utensils">
+              <input
+                type="text"
+                id="search-utensils"
+                name="search"
+                placeholder=""
+              />
+              <button id="search-utensils-btn">
+                <img
+                  src="./assets/icons/search-filter.svg"
+                  alt="search button"
+                />
+              </button>
+            </form>
+            <!-- options here -->
+          </div>
+        </div>
+
         <p id="nbr-recipes">1500 recettes</p>
       </section>
       <section id="recipies"></section>
