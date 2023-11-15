@@ -2,11 +2,171 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Les petits plats</title>
+    <link rel="stylesheet" href="src/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
+    <header id="header">
+      <div id="logo">
+        <img
+          class="logo-text"
+          src="assets/images/logo-text.png.png"
+          alt="logo"
+        />
+        <img
+          class="logo-dot"
+          src="assets/images/logo-dot.png.png"
+          aria-hidden="true"
+        />
+      </div>
+      <h1 id="catchphrase">
+        CHERCHEZ PARMI PLUS DE 1500 RECETTES DU QUOTIDIEN,SIMPLES ET DÉLICIEUSES
+      </h1>
+      <section id="search-bar">
+        <form id="search-form">
+          <input
+            type="text"
+            id="search-input"
+            name="search"
+            placeholder="Rechercher une recette, un ingrédient, ..."
+          />
+          <button id="search-btn">
+            <svg
+              id="search-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="28"
+              height="28"
+              viewBox="0 0 28 28"
+              fill="none"
+            >
+              <circle cx="10" cy="10" r="9.5" stroke="white" />
+              <line
+                x1="18.3536"
+                y1="18.6464"
+                x2="27.3536"
+                y2="27.6464"
+                stroke="white"
+              />
+            </svg>
+          </button>
+        </form>
+      </section>
+    </header>
+    <main>
+      <section id="tags">
+        <div class="filter-container">
+          <button
+            id="ingredients-btn"
+            class="filters-btn"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="sort-option-container"
+            role="button"
+          >
+            Ingrédients
+            <div id="sort-arrow" class="arrow-down" aria-hidden="true"></div>
+          </button>
+
+          <div class="dropdown-content dropdown-ingredients display-none">
+            <form class="dropdown-search-ingredients">
+              <input
+                type="text"
+                id="search-ingredients"
+                name="search"
+                placeholder=""
+              />
+              <button id="search-ingredients-btn">
+                <img
+                  src="./assets/icons/search-filter.svg"
+                  alt="search button"
+                />
+              </button>
+            </form>
+            <!-- options here -->
+          </div>
+        </div>
+
+        <div class="filter-container">
+          <button
+            id="devices-btn"
+            class="filters-btn"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="sort-option-container"
+            role="button"
+          >
+            Appareils
+            <div id="sort-arrow" class="arrow-down" aria-hidden="true"></div>
+          </button>
+
+          <div class="dropdown-content dropdown-devices display-none">
+            <form class="dropdown-search-ingredient">
+              <input
+                type="text"
+                id="search-devices"
+                name="search"
+                placeholder=""
+              />
+              <button id="search-devices-btn">
+                <img
+                  src="./assets/icons/search-filter.svg"
+                  alt="search button"
+                />
+              </button>
+            </form>
+            <!-- options here -->
+          </div>
+        </div>
+
+        <div class="filter-container">
+          <button
+            id="utensils-btn"
+            class="filters-btn"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="sort-option-container"
+            role="button"
+          >
+            Ustensiles
+            <div id="sort-arrow" class="arrow-down" aria-hidden="true"></div>
+          </button>
+
+          <div class="dropdown-content dropdown-utensils display-none">
+            <form class="dropdown-search-utensils">
+              <input
+                type="text"
+                id="search-utensils"
+                name="search"
+                placeholder=""
+              />
+              <button id="search-utensils-btn">
+                <img
+                  src="./assets/icons/search-filter.svg"
+                  alt="search button"
+                />
+              </button>
+            </form>
+            <!-- options here -->
+          </div>
+        </div>
+
+        <p id="nbr-recipes">1500 recettes</p>
+      </section>
+      <section id="recipies"></section>
+    </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
