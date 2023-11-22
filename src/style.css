@@ -105,6 +105,13 @@ body {
   width: 100%;
 }
 
+.tags-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 64px;
+}
+
 .filters-btn {
   appearance: none;
   border: none;
@@ -142,7 +149,7 @@ body {
   transform: rotate(45deg);
 }
 
-#nbr-recipes {
+.nbr-recipes {
   font-family: "Anton", sans-serif;
   font-size: 21px;
   font-style: normal;
