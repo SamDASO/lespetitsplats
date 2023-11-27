@@ -1,9 +1,11 @@
-export interface recipes {
+import { Ingredient } from "./ingredient.ts";
+
+export interface Recipe {
   id: number;
   image: string;
   name: string;
   servings: number;
-  ingredients: ingredientsArray[];
+  ingredients: Ingredient[];
   time: number;
   description: string;
   appliance: string;

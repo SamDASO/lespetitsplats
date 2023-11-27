@@ -1,11 +1,11 @@
 //IMPORTS
 
-import { recipes } from "../models/recipes.ts";
+import { Recipe } from "../models/recipe.ts";
 
 //Recipes components
 
-export function getRecipesCardDom(recipes: recipes) {
-  const { id, image, name, time, description } = recipes;
+export function getRecipeCardDom(recipe: Recipe) {
+  const { id, image, name, time, description } = recipe;
 
   const cardRecipe = document.createElement("div");
   cardRecipe.classList.add("card-recipes");
@@ -39,8 +39,9 @@ export function getRecipesCardDom(recipes: recipes) {
 
   //Ingredients component
 
-  function getIngredientsCard(recipes: recipes) {
-    const { ingredients } = recipes;
+  function getIngredientCard(recipe: Recipe) {
+    //prendre en paramètre un ingredient, gérer que l'ingrédient donc que le for each ici, dans le for each
+    const { ingredients } = recipe;
 
     const ingredientsSubtitle = document.createElement("h3");
     ingredientsSubtitle.classList.add("subtitle-ingredients");
@@ -66,6 +67,7 @@ export function getRecipesCardDom(recipes: recipes) {
       ingredientQuantityAndUnit.classList.add("ingredient-quantity-unit");
 
       if (element.quantity && element.quantity !== undefined) {
+        //voir pour enlever undefined dans les deux
         const ingredientQuantity = document.createElement("p");
         ingredientQuantity.classList.add("ingredient-quantity");
         ingredientQuantity.textContent = String(element.quantity);
@@ -99,7 +101,7 @@ export function getRecipesCardDom(recipes: recipes) {
   recipeSubDiv.appendChild(recipeSubtitle);
   recipeSubDiv.appendChild(recipeDescription);
 
-  linkRecipe.appendChild(getIngredientsCard(recipes));
+  linkRecipe.appendChild(getIngredientCard(recipe));
 
   return cardRecipe;
 }

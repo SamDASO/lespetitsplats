@@ -1,54 +1,81 @@
-//IMPORTS
+///////////////////////////////////IMPORTS
 
-import { recipes } from "./models/recipes.ts";
-import { getRecipesCardDom } from "./components/recipes-components.ts";
-import { getTagsCardDom } from "./components/tags.ts";
+import { Recipe } from "./models/recipe.ts";
+import { getRecipeCardDom } from "./components/recipe-component.ts";
+import { getFiltersCardDom } from "./components/filters-dom.ts";
 
-//DATAS
+///////////////////////////////////DATAS
 
-async function getRecipesData() {
+export async function getRecipesData() {
   const recipesDatas = await fetch("./data/recipes.json");
   return recipesDatas.json();
 }
 
-//DISPLAYS FUNCTIONS
+///////////////////////////////////DISPLAYS FUNCTIONS
 
-function displayRecipes(recipesArray: recipes[]) {
+function displayRecipes(recipesArray: Recipe[]) {
   const recipesSection = document.getElementById("recipes-section");
 
-  recipesArray.forEach((recipe: recipes) => {
-    const recipesModel = getRecipesCardDom(recipe);
+  recipesArray.forEach((recipe: Recipe) => {
+    const recipesModel = getRecipeCardDom(recipe);
 
     recipesSection?.appendChild(recipesModel);
   });
 }
 
-function displayTags() {
-  const tagsSection = document.getElementById("tags");
-  const tagsContainer = document.createElement("div");
-  tagsContainer.classList.add("tags-container");
+function displayFilters(recipes: Recipe[]) {
+  const filtersSection = document.getElementById("filters");
+  const filtersContainer = document.createElement("div");
+  filtersContainer.classList.add("filters-container");
 
-  const tagsDom = getTagsCardDom();
+  const filtersDom = getFiltersCardDom(recipes);
 
-  tagsDom.forEach((container) => {
-    tagsContainer.appendChild(container);
+  filtersDom.forEach((container) => {
+    filtersContainer.appendChild(container);
   });
 
   const nbrRecipes = document.createElement("p");
   nbrRecipes.classList.add("nbr-recipes");
   nbrRecipes.textContent = "1500 recettes";
 
-  tagsSection?.appendChild(tagsContainer);
-  tagsSection?.appendChild(nbrRecipes);
+  filtersSection?.appendChild(filtersContainer);
+  filtersSection?.appendChild(nbrRecipes);
 }
 
-//INIT FUNCTION
+///////////////////////////////////INIT FUNCTION
 
 async function init() {
   const { recipes } = await getRecipesData();
   displayRecipes(recipes);
 
-  displayTags();
+  displayFilters(recipes);
+
+  ///////////////////////////////////EVENTLISTENER
+
+  //FILTERS BUTTONS
+  const filtersBtn = document.querySelectorAll(".filters-btn");
+
+  filtersBtn.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const button = btn as HTMLElement;
+      const dropdownMenu = button.nextElementSibling as HTMLElement;
+      const arrow = button.querySelector(".arrow-filter") as HTMLElement;
+
+      if (dropdownMenu.style.display === "none") {
+        dropdownMenu.style.display = "flex";
+        button.style.borderBottomRightRadius = "0";
+        button.style.borderBottomLeftRadius = "0";
+        arrow.classList.add("arrow-up");
+        arrow.classList.remove("arrow-down");
+      } else {
+        dropdownMenu.style.display = "none";
+        button.style.borderBottomRightRadius = "11px";
+        button.style.borderBottomLeftRadius = "11px";
+        arrow.classList.add("arrow-down");
+        arrow.classList.remove("arrow-up");
+      }
+    });
+  });
 }
 
 init();

@@ -12,10 +12,6 @@ body {
   background-color: #ededed;
 }
 
-.display-none {
-  display: none;
-}
-
 #header {
   display: flex;
   flex-direction: column;
@@ -96,20 +92,23 @@ body {
   margin: 0 100px;
 }
 
-#tags {
+#filters {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-top: 50px;
   gap: 60px;
   width: 100%;
 }
 
-.tags-container {
+.filters-container {
   display: flex;
   justify-content: flex-start;
-  align-items: center;
+  align-items: flex-start;
   gap: 64px;
+}
+.filter-container {
+  width: 163px;
 }
 
 .filters-btn {
@@ -120,11 +119,12 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 163px;
   padding: 17px 16px;
   font-family: "Manrope", sans-serif;
   font-size: 16px;
-  gap: 63px;
   border-radius: 11px;
+  cursor: pointer;
 }
 
 .arrow-down {
@@ -147,6 +147,68 @@ body {
   font-size: 18px;
   font-weight: 700;
   transform: rotate(45deg);
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  z-index: 100;
+  width: 131px;
+  flex-direction: column;
+  justify-content: center;
+  background-color: white;
+  border-bottom-right-radius: 11px;
+  border-bottom-left-radius: 11px;
+  padding: 0 16px 14px;
+  gap: 13px;
+  flex-wrap: wrap;
+}
+
+#dropdown-search {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding: 0 10px;
+  width: 90%;
+  height: 36px;
+  border-radius: 2px;
+  background: #fff;
+  border: 1px solid #c6c6c6;
+}
+
+#dropdown-input {
+  width: 90%;
+  height: 95%;
+  background: transparent;
+  border: none;
+  color: #c6c6c6;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+#dropdown-input:focus {
+  outline: none;
+}
+
+#dropdown-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  appearance: none;
+  border: none;
+  box-shadow: none;
+  background-color: transparent;
+}
+
+#dropdown-btn img {
+  width: 100%;
+  height: auto;
+}
+
+.container-data {
+  max-height: 315px;
+  overflow-y: auto;
 }
 
 .nbr-recipes {
