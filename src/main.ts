@@ -13,7 +13,7 @@ export async function getRecipesData() {
 
 ///////////////////////////////////DISPLAYS FUNCTIONS
 
-function displayRecipes(recipesArray: Recipe[]) {
+export function displayRecipes(recipesArray: Recipe[]) {
   const recipesSection = document.getElementById("recipes-section");
 
   recipesArray.forEach((recipe: Recipe) => {

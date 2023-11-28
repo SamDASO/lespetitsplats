@@ -211,6 +211,16 @@ body {
   overflow-y: auto;
 }
 
+.filtered-element {
+  font-size: 14px;
+  cursor: pointer;
+}
+/*NEEDS TO BE CHANGE IN THE PROCESS OF SELECTION*/
+.selected-filtered-element {
+  background-color: #ffd15b;
+}
+/**/
+
 .nbr-recipes {
   font-family: "Anton", sans-serif;
   font-size: 21px;

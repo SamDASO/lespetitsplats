@@ -63,6 +63,7 @@ function getMenuListDom(allData: string[]) {
 
   allData.forEach((element: string) => {
     const filterElement = document.createElement("p");
+    filterElement.classList.add("filtered-element");
     filterElement.textContent = element;
 
     containerData.appendChild(filterElement);
