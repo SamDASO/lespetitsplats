@@ -9,12 +9,12 @@ class Page implements IObserver, ISubject {
   private observers: IObserver[] = [];
   private recipesDisplayed: Recipe[] = [];
 
-  //as Observer
+  //as Observer -> récupère les recette filtrées de Filtres
   update(filtredRecipes: Recipe[]) {
     this.getRecipes(filtredRecipes);
   }
 
-  //as Subject
+  //as Subject -> (met à jour les recettes + nbr recettes) envoi les recettes
   addObserver(observer: IObserver): void {
     this.observers.push(observer);
   }
@@ -34,13 +34,12 @@ class Filters implements IObserver, ISubject {
   private observers: IObserver[] = [];
   private filterElements: [] = [];
 
-  //as Observer
-  // Update method to receive changes from the filter element
+  //as Observer -> met à jour les recettes filtrées en fonction de chaque FiltreElement
   update(selectedFilter: any): void {
     this.filterElements.push(selectedFilter);
   }
 
-  //as Subject
+  //as Subject -> Envoi un nouveau tableau de recettes filtrées
   addObserver(observer: IObserver): void {
     this.observers.push(observer);
   }
@@ -65,12 +64,12 @@ class FilterElement implements IObserver, ISubject {
     });
   }
 
-  //as observer
+  //as observer -> met à jours ses tags en fonctions des recettes filtrées
   update(filtersByRecipes: any): void {
     this.displayFilters(filtersByRecipes);
   }
 
-  //as Subject
+  //as Subject -> envoi les tags selectionnées à Filtres
   addObserver(observer: IObserver): void {
     this.observers.push(observer);
   }
