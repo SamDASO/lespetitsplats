@@ -1,8 +1,10 @@
 ///////////////////////////////////IMPORTS
 
 import { Recipe } from "./models/recipe.ts";
-import { getRecipeCardDom } from "./components/recipe-component.ts";
-import { getFiltersCardDom } from "./components/filters-dom.ts";
+import { RecipeComponent } from "./components/recipeComponent.ts";
+import { FiltersComponent } from "./components/filtersComponent.ts";
+import { FiltersState } from "./state/filtersState.ts";
+import { RecipesState } from "./state/recipesState.ts";
 
 ///////////////////////////////////DATAS
 
@@ -13,17 +15,17 @@ export async function getRecipesData() {
 
 ///////////////////////////////////DISPLAYS FUNCTIONS
 
-export function displayRecipes(recipesArray: Recipe[]) {
+export function displayRecipes(state: RecipesState) {
   const recipesSection = document.getElementById("recipes-section");
 
-  recipesArray.forEach((recipe: Recipe) => {
-    const recipesModel = getRecipeCardDom(recipe);
+  state.getRecipesDisplayed().forEach((recipe: Recipe) => {
+    const element = new RecipeComponent(recipe);
 
-    recipesSection?.appendChild(recipesModel);
+    recipesSection?.appendChild(element.render());
   });
 }
 
-function displayFilters(recipes: Recipe[]) {
+/*function displayFilters(recipes: Recipe[]) {
   const filtersSection = document.getElementById("filters");
   const filtersContainer = document.createElement("div");
   filtersContainer.classList.add("filters-container");
@@ -40,42 +42,25 @@ function displayFilters(recipes: Recipe[]) {
 
   filtersSection?.appendChild(filtersContainer);
   filtersSection?.appendChild(nbrRecipes);
-}
+}*/
 
 ///////////////////////////////////INIT FUNCTION
 
 async function init() {
   const { recipes } = await getRecipesData();
-  displayRecipes(recipes);
 
-  displayFilters(recipes);
+  //initialisation du state
+  const recipesState = new RecipesState(recipes, []);
+  const filtersState = new FiltersState();
 
-  ///////////////////////////////////EVENTLISTENER
+  // initialisation de l'affichage
+  displayRecipes(recipesState);
+  /*displayFilters(recipesState.getRecipesDisplayed());*/
 
-  //FILTERS BUTTONS
-  const filtersBtn = document.querySelectorAll(".filters-btn");
+  const filtersComponent = new FiltersComponent(filtersState);
 
-  filtersBtn.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const button = btn as HTMLElement;
-      const dropdownMenu = button.nextElementSibling as HTMLElement;
-      const arrow = button.querySelector(".arrow-filter") as HTMLElement;
-
-      if (dropdownMenu.style.display === "none") {
-        dropdownMenu.style.display = "flex";
-        button.style.borderBottomRightRadius = "0";
-        button.style.borderBottomLeftRadius = "0";
-        arrow.classList.add("arrow-up");
-        arrow.classList.remove("arrow-down");
-      } else {
-        dropdownMenu.style.display = "none";
-        button.style.borderBottomRightRadius = "11px";
-        button.style.borderBottomLeftRadius = "11px";
-        arrow.classList.add("arrow-down");
-        arrow.classList.remove("arrow-up");
-      }
-    });
-  });
+  // liaison Observer/Observable
+  /*recipesState.addObserver(filtersComponent);*/
 }
 
 init();

@@ -214,12 +214,31 @@ body {
 .filtered-element {
   font-size: 14px;
   cursor: pointer;
+  padding: 5px;
 }
-/*NEEDS TO BE CHANGE IN THE PROCESS OF SELECTION*/
-.selected-filtered-element {
+
+.filtered-element:hover {
   background-color: #ffd15b;
 }
-/**/
+
+.selected-filtered-element {
+  background-color: #ffd15b;
+  font-weight: 700;
+}
+
+.element-selected-container {
+  background-color: #ffd15b;
+  display: inline-flex;
+  padding: 17px 18px;
+  align-items: center;
+  gap: 60px;
+  border-radius: 11px;
+}
+
+.element-selected {
+  font-size: 14px;
+  color: black;
+}
 
 .nbr-recipes {
   font-family: "Anton", sans-serif;
