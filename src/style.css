@@ -94,18 +94,25 @@ body {
 
 #filters {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
-  margin-top: 50px;
-  gap: 60px;
+  margin: 40px 0;
+  gap: 21px;
   width: 100%;
 }
 
-.filters-container {
+.filters-compartement {
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 64px;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.btn-compartement {
+  display: flex;
+  justify-content: space-between;
+  gap: 60px;
 }
 .filter-container {
   width: 163px;

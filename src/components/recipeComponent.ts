@@ -3,11 +3,12 @@
 import { Recipe } from "../models/recipe.ts";
 import { Component } from "../models/component.ts";
 import { Ingredient } from "../models/ingredient.ts";
+import { IObserver } from "../models/observer-interfaces.ts";
 
 //class recipes DOM
 
-export class RecipeComponent implements Component {
-  private readonly recipe: Recipe;
+export class RecipeComponent implements Component, IObserver {
+  private recipe: Recipe;
 
   constructor(recipe: Recipe) {
     this.recipe = recipe;
@@ -60,6 +61,11 @@ export class RecipeComponent implements Component {
     return cardRecipe;
   }
 
+  update(recipesUpdates: Recipe[]) {
+    recipesUpdates.forEach((recipeUpdate) => {
+      this.recipe = recipeUpdate;
+    });
+  }
   //Ingredients component
 
   private getIngredientDiv() {

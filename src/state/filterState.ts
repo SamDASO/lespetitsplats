@@ -4,24 +4,24 @@ import { FiltersState } from "./filtersState.ts";
 
 export class FilterState implements IObservable, IObserver {
   private observers: IObserver[] = [];
-  private filtersDisplayed: Filters;
+  private filtersDisplayed: Filters[];
   private selectedFilter: Filters;
   private filtersStateInstance: FiltersState;
 
-  constructor(displayedFilters: Filters, observers: IObserver[]) {
+  constructor(observers: IObserver[]) {
     this.observers = observers;
-    this.filtersDisplayed = displayedFilters;
     this.selectedFilter = {
       ingredients: new Set(),
       appliances: new Set(),
       ustensils: new Set(),
     };
     this.filtersStateInstance = new FiltersState();
+    this.filtersDisplayed = [];
   }
 
   //As Observer
   //obtain filters to display by FiltersState
-  update(filters: Filters) {
+  update(filters: Filters[]) {
     filters = this.filtersDisplayed;
   }
 
@@ -37,7 +37,7 @@ export class FilterState implements IObservable, IObserver {
 
   //filters management
 
-  getFilterToMenuList(): Filters {
+  getFilterToMenuList(): Filters[] {
     this.filtersDisplayed;
     return this.filtersDisplayed;
   }

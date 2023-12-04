@@ -1,10 +1,11 @@
 ///////////////////////////////////IMPORTS
 
-import { Recipe } from "./models/recipe.ts";
 import { RecipeComponent } from "./components/recipeComponent.ts";
 import { FiltersComponent } from "./components/filtersComponent.ts";
 import { FiltersState } from "./state/filtersState.ts";
 import { RecipesState } from "./state/recipesState.ts";
+import { FilterState } from "./state/filterState.ts";
+import { FilterComponent } from "./components/filterComponent.ts";
 
 ///////////////////////////////////DATAS
 
@@ -13,54 +14,47 @@ export async function getRecipesData() {
   return recipesDatas.json();
 }
 
-///////////////////////////////////DISPLAYS FUNCTIONS
-
-export function displayRecipes(state: RecipesState) {
-  const recipesSection = document.getElementById("recipes-section");
-
-  state.getRecipesDisplayed().forEach((recipe: Recipe) => {
-    const element = new RecipeComponent(recipe);
-
-    recipesSection?.appendChild(element.render());
-  });
-}
-
-/*function displayFilters(recipes: Recipe[]) {
-  const filtersSection = document.getElementById("filters");
-  const filtersContainer = document.createElement("div");
-  filtersContainer.classList.add("filters-container");
-
-  const filtersDom = getFiltersCardDom(recipes);
-
-  filtersDom.forEach((container) => {
-    filtersContainer.appendChild(container);
-  });
-
-  const nbrRecipes = document.createElement("p");
-  nbrRecipes.classList.add("nbr-recipes");
-  nbrRecipes.textContent = "1500 recettes";
-
-  filtersSection?.appendChild(filtersContainer);
-  filtersSection?.appendChild(nbrRecipes);
-}*/
-
 ///////////////////////////////////INIT FUNCTION
 
 async function init() {
   const { recipes } = await getRecipesData();
 
-  //initialisation du state
-  const recipesState = new RecipesState(recipes, []);
+  //state initialisation
   const filtersState = new FiltersState();
+  const recipesState = new RecipesState([], recipes);
+  const filterState = new FilterState([]);
 
-  // initialisation de l'affichage
-  displayRecipes(recipesState);
-  /*displayFilters(recipesState.getRecipesDisplayed());*/
-
+  // Component initialization
+  const recipesComponents: RecipeComponent[] = recipesState
+    .getRecipesDisplayed()
+    .map((recipe) => new RecipeComponent(recipe));
   const filtersComponent = new FiltersComponent(filtersState);
+  const filterComponent = new FilterComponent();
 
-  // liaison Observer/Observable
-  /*recipesState.addObserver(filtersComponent);*/
+  // Display initial content
+  recipesComponents.forEach((component) => {
+    component.render();
+  });
+  filtersComponent.render();
+  filterComponent.render();
+
+  // display initialisation
+  const containerElement = document.getElementById("recipes-section");
+
+  recipesComponents.forEach((component) => {
+    containerElement?.appendChild(component.render());
+  });
+
+  // Recipes components observes the recipes state
+  recipesComponents.forEach((component) => {
+    recipesState.addObserver(component);
+  });
+
+  // Filters component observe the filters state
+  filtersState.addObserver(filtersComponent, false);
+
+  //FilterElement component observes the filter state
+  filterState.addObserver(filterComponent);
 }
 
 init();

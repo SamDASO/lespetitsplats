@@ -1,10 +1,12 @@
 import { Component } from "../models/component.ts";
+import { IObserver } from "../models/observer-interfaces.ts";
 import { FiltersState } from "../state/filtersState.ts";
 import { RecipesState } from "../state/recipesState.ts";
+import { FilterComponent } from "./filterComponent.ts";
 
 //Filters DOM
 
-export class FiltersComponent implements Component {
+export class FiltersComponent implements Component, IObserver {
   private state: FiltersState;
 
   constructor(state: FiltersState) {
@@ -12,17 +14,20 @@ export class FiltersComponent implements Component {
   }
 
   render(): HTMLElement {
+    const filtersDisplayFirstLayer = document.createElement("div");
+    filtersDisplayFirstLayer.classList.add("filters-compartement");
+
     //buttons
     const section = document.getElementById("filters");
 
-    const filtersCompartement = document.createElement("div");
-    filtersCompartement.classList.add("filters-compartement");
+    const btnsCompartement = document.createElement("div");
+    btnsCompartement.classList.add("btn-compartement");
 
     const tagsArray: string[] = ["Ingrédients", "Appareils", "Ustensiles"];
 
     tagsArray.forEach((option) => {
       const container = this.createFilterContainer(option);
-      filtersCompartement.appendChild(container);
+      btnsCompartement.appendChild(container);
     });
 
     //Nbr total recipes
@@ -32,10 +37,14 @@ export class FiltersComponent implements Component {
     nbrRecipes.classList.add("nbr-recipes");
     nbrRecipes.textContent = `${totalRecipes} recettes`;
 
-    filtersCompartement.appendChild(nbrRecipes);
-    section!.appendChild(filtersCompartement);
+    filtersDisplayFirstLayer.appendChild(btnsCompartement);
+    filtersDisplayFirstLayer.appendChild(nbrRecipes);
+    section!.appendChild(filtersDisplayFirstLayer);
     const selectedFilters = this.state.getSelectedFilters();
-    section!.appendChild(this.displaySectionFilterSelected(selectedFilters));
+
+    if (selectedFilters.length !== 0) {
+      section!.appendChild(this.displaySectionFilterSelected(selectedFilters));
+    }
 
     return section!;
   }
@@ -58,7 +67,8 @@ export class FiltersComponent implements Component {
     buttonTags.appendChild(arrowDown);
 
     buttonTags.addEventListener("click", () => {
-      const dropdownMenu = buttonTags.nextElementSibling as HTMLElement;
+      const filterComponentInstance = new FilterComponent();
+      const dropdownMenu = filterComponentInstance.render();
       const arrow = buttonTags.querySelector(".arrow-filter") as HTMLElement;
 
       if (dropdownMenu.style.display === "none") {
@@ -81,7 +91,6 @@ export class FiltersComponent implements Component {
 
   displaySectionFilterSelected(selectedFilters: any) {
     const filterContainer = this.displaySelectedFilterDom(selectedFilters);
-
     return filterContainer;
   }
 
@@ -107,5 +116,9 @@ export class FiltersComponent implements Component {
     });
 
     return filterContainer;
+  }
+
+  update() {
+    this.state;
   }
 }

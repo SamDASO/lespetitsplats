@@ -20,6 +20,11 @@ export class FiltersState implements IObservable, IObserver {
   // As observable
 
   getFiltersToDisplay() {
+    {
+      ingredients: Set<string>;
+      appliances: Set<string>;
+      ustensils: Set<string>;
+    }
     return this.filtersList;
   }
 

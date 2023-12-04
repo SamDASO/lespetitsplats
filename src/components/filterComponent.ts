@@ -1,13 +1,10 @@
 import { Component } from "../models/component.ts";
+import { IObserver } from "../models/observer-interfaces.ts";
 import { FilterState } from "../state/filterState.ts";
 import { FiltersState } from "../state/filtersState.ts";
 
-export class FilterComponent implements Component {
-  private state: FilterState;
-
-  constructor(state: FilterState) {
-    this.state = state;
-  }
+export class FilterComponent implements Component, IObserver {
+  constructor() {}
 
   render(): HTMLElement {
     const tagsArray: string[] = ["Ingrédients", "Appareils", "Ustensiles"];
@@ -66,5 +63,10 @@ export class FilterComponent implements Component {
     dropdownContent.appendChild(containerData);
 
     return dropdownContent;
+  }
+
+  update(state: any): void {
+    state = new FilterState([]);
+    state.render;
   }
 }
