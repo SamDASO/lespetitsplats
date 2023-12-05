@@ -50,8 +50,10 @@ export class FiltersComponent implements Component, IObserver {
   }
 
   private createFilterContainer(option: string): HTMLDivElement {
+    const filterComponent = new FilterComponent();
     const containerFilters = document.createElement("div");
     containerFilters.classList.add("filter-container");
+    containerFilters.classList.add(`filter-container-${option}`);
 
     const buttonTags = document.createElement("button");
     buttonTags.classList.add("filters-btn");
@@ -67,9 +69,8 @@ export class FiltersComponent implements Component, IObserver {
     buttonTags.appendChild(arrowDown);
 
     buttonTags.addEventListener("click", () => {
-      const filterComponentInstance = new FilterComponent();
-      const dropdownMenu = filterComponentInstance.render();
-      const arrow = buttonTags.querySelector(".arrow-filter") as HTMLElement;
+      const dropdownMenu = filterComponent.render(option);
+      const arrow = arrowDown;
 
       if (dropdownMenu.style.display === "none") {
         dropdownMenu.style.display = "flex";
@@ -84,6 +85,7 @@ export class FiltersComponent implements Component, IObserver {
         arrow.classList.add("arrow-down");
         arrow.classList.remove("arrow-up");
       }
+      containerFilters.appendChild(dropdownMenu);
     });
 
     return containerFilters;

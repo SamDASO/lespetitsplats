@@ -6,24 +6,28 @@ import { FiltersState } from "../state/filtersState.ts";
 export class FilterComponent implements Component, IObserver {
   constructor() {}
 
-  render(): HTMLElement {
-    const tagsArray: string[] = ["Ingrédients", "Appareils", "Ustensiles"];
+  render(option?: string): HTMLElement {
     const filtersStateInstance = new FiltersState();
-    let filtersDisplay: Set<string>;
+    let filtersDisplay;
 
-    tagsArray.forEach((option) => {
-      if (option === "Ingrédients") {
-        filtersDisplay = filtersStateInstance.getFiltersToDisplay().ingredients;
-      }
-      if (option === "Appareils") {
-        filtersDisplay = filtersStateInstance.getFiltersToDisplay().appliances;
-      }
-      if (option === "Ustensiles") {
-        filtersDisplay = filtersStateInstance.getFiltersToDisplay().ustensils;
-      }
-    });
+    if (option === "Ingrédients") {
+      filtersDisplay = filtersStateInstance.getFiltersToDisplay().ingredients;
+    }
+    if (option === "Appareils") {
+      filtersDisplay = filtersStateInstance.getFiltersToDisplay().appliances;
+    }
+    if (option === "Ustensiles") {
+      filtersDisplay = filtersStateInstance.getFiltersToDisplay().ustensils;
+    }
 
-    return this.getMenuListDom(filtersDisplay!);
+    const dropdownContent = this.getMenuListDom(filtersDisplay!);
+
+    const filterContainer = document.querySelector(
+      `.filter-container-${option}`
+    );
+    filterContainer!.appendChild(dropdownContent);
+
+    return dropdownContent;
   }
 
   private getMenuListDom(filters: any): HTMLElement {
@@ -65,8 +69,10 @@ export class FilterComponent implements Component, IObserver {
     return dropdownContent;
   }
 
-  update(state: any): void {
-    state = new FilterState([]);
-    state.render;
+  update() {
+    const filterState = new FilterState([]);
+    const filters = filterState.getFilterToMenuList();
+
+    this.getMenuListDom(filters);
   }
 }

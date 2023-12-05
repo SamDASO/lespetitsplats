@@ -4,8 +4,7 @@ import { RecipeComponent } from "./components/recipeComponent.ts";
 import { FiltersComponent } from "./components/filtersComponent.ts";
 import { FiltersState } from "./state/filtersState.ts";
 import { RecipesState } from "./state/recipesState.ts";
-import { FilterState } from "./state/filterState.ts";
-import { FilterComponent } from "./components/filterComponent.ts";
+import { Recipe } from "./models/recipe.ts";
 
 ///////////////////////////////////DATAS
 
@@ -14,29 +13,32 @@ export async function getRecipesData() {
   return recipesDatas.json();
 }
 
+async function fetchDataAndInit() {
+  const { recipes } = await getRecipesData();
+  init(recipes);
+}
+
 ///////////////////////////////////INIT FUNCTION
 
-async function init() {
-  const { recipes } = await getRecipesData();
+function init(recipesdata: Recipe[]) {
+  const recipes = recipesdata;
 
   //state initialisation
   const filtersState = new FiltersState();
   const recipesState = new RecipesState([], recipes);
-  const filterState = new FilterState([]);
 
   // Component initialization
   const recipesComponents: RecipeComponent[] = recipesState
     .getRecipesDisplayed()
     .map((recipe) => new RecipeComponent(recipe));
   const filtersComponent = new FiltersComponent(filtersState);
-  const filterComponent = new FilterComponent();
 
   // Display initial content
   recipesComponents.forEach((component) => {
     component.render();
   });
+  filtersState.update(recipes, true);
   filtersComponent.render();
-  filterComponent.render();
 
   // display initialisation
   const containerElement = document.getElementById("recipes-section");
@@ -52,9 +54,6 @@ async function init() {
 
   // Filters component observe the filters state
   filtersState.addObserver(filtersComponent, false);
-
-  //FilterElement component observes the filter state
-  filterState.addObserver(filterComponent);
 }
 
-init();
+fetchDataAndInit();

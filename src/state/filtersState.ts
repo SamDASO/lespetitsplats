@@ -20,12 +20,11 @@ export class FiltersState implements IObservable, IObserver {
   // As observable
 
   getFiltersToDisplay() {
-    {
-      ingredients: Set<string>;
-      appliances: Set<string>;
-      ustensils: Set<string>;
-    }
     return this.filtersList;
+  }
+
+  generatedFiltersFunction(recipes: Recipe[]) {
+    return this.generateFilters(recipes);
   }
 
   getSelectedFilters() {
@@ -48,7 +47,7 @@ export class FiltersState implements IObservable, IObserver {
       });
     } else {
       this.filterObservers.forEach((observer) => {
-        observer.update(this.filterObservers);
+        observer.update(this.getFiltersToDisplay);
       });
     }
   }

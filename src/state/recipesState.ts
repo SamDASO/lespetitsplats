@@ -1,6 +1,7 @@
 import { IObservable, IObserver } from "../models/observer-interfaces.ts";
 import { Recipe } from "../models/recipe.ts";
 import { Filters } from "../models/filters.ts";
+import { FiltersState } from "./filtersState.ts";
 
 export class RecipesState implements IObservable, IObserver {
   private observers: IObserver[] = [];
@@ -29,15 +30,24 @@ export class RecipesState implements IObservable, IObserver {
 
   //Notify the FiltersState about the recipes that are displayed
   notifyObservers(): void {
-    const recipesUpdate = this.filterRecipes;
+    let recipesUpdate: Recipe[];
+    if (this.recipesDisplayed.length == 0) {
+      recipesUpdate = this.allRecipes;
+    } else {
+      const filtersState = new FiltersState();
+      recipesUpdate = this.update(
+        filtersState.generatedFiltersFunction(this.allRecipes)
+      );
+    }
     this.observers.forEach((observer) => observer.update(recipesUpdate, true));
   }
 
   //As observer
 
-  update(filters: any): void {
-    this.filterRecipes(filters); // recived by filters that have been selected by filter
+  update(filters: any): Recipe[] {
+    const updatedRecipes = this.filterRecipes(filters); // recived by filters that have been selected by filter
     this.notifyObservers(); //notify the Filters
+    return updatedRecipes;
   }
 
   private filterRecipes(filters: Filters) {
