@@ -10,6 +10,8 @@ export class FilterComponent implements Component, IObserver {
     availableFilters: Filters;
     selectedFilters: Filters;
   };
+  private dropdownContent: HTMLUListElement;
+  private closeCross: HTMLImageElement;
 
   constructor(state: FiltersState, option: string) {
     this.option = option;
@@ -26,6 +28,8 @@ export class FilterComponent implements Component, IObserver {
         ustensils: new Set(),
       },
     };
+    this.dropdownContent = document.createElement("ul");
+    this.closeCross = document.createElement("img");
   }
 
   //Render one button, with all it's content and the dropdownMenu depending of the option
@@ -52,6 +56,8 @@ export class FilterComponent implements Component, IObserver {
 
     let filterListContainer = document.createElement("div");
     filterListContainer.classList.add("dropdown-container");
+
+    btnOption.appendChild(filterListContainer);
 
     //Search bar for option
 
@@ -104,37 +110,35 @@ export class FilterComponent implements Component, IObserver {
 
     //Toggle selected filters
 
-    /*const newSelectedFilter = this.allFilters.addFilter();
-    const newUnselectedFilter = this.allFilters.removeFilter();*/
-
-    return filterListContainer;
+    return btnOption;
   }
 
-  private getMenuListDom(filters: Filters): HTMLDivElement {
-    const dropdownContent = document.createElement("div");
-    dropdownContent.classList.add("dropdown-content");
-    dropdownContent.id = `dropdown-content-${this.option}`;
+  private getMenuListDom(filters: Filters): HTMLUListElement {
+    this.dropdownContent.classList.add("dropdown-content");
+    this.dropdownContent.id = `dropdown-content-${this.option}`;
 
-    Object.entries(filters).forEach((filterSet: Set<string>) => {
+    for (const filterSet of Object.entries(filters)) {
       filterSet.forEach((filter: string) => {
-        const filterElement = document.createElement("p");
-        filterElement.classList.add("filtered-element");
+        const filterElement = document.createElement("li");
+        filterElement.classList.add("filtered-element-list");
         filterElement.textContent = filter;
+        const elementText = filter?.replace(/\s+/g, "").toLowerCase();
+        this.closeCross.setAttribute("src", "assets/icons/cross.svg");
+        this.closeCross.classList.add(
+          "close-element",
+          `close-element-${elementText}`
+        );
 
-        // Add click event listener for adding/removing filters
         filterElement.addEventListener("click", () => {
-          if (this.allFilters.selectedFilters[this.option].has(filter)) {
-            this.removeFilter(filter, this.option);
-          } else {
-            this.addFilter(filter, this.option);
-          }
+          this.toggleFilterSelection(filterElement);
         });
 
-        dropdownContent.appendChild(filterElement);
+        filterElement.appendChild(this.closeCross);
+        this.dropdownContent.appendChild(filterElement);
       });
-    });
+    }
 
-    return dropdownContent;
+    return this.dropdownContent;
   }
 
   update(filters: Filters) {
@@ -154,19 +158,26 @@ export class FilterComponent implements Component, IObserver {
     return this.allFilters.availableFilters;
   }
 
-  private addFilter(filter: string, option: string) {
-    const selectedFilters = this.allFilters.selectedFilters[
-      option
-    ] as Set<string>;
-    selectedFilters.add(filter);
-    this.state.notifyObservers();
-  }
+  private toggleFilterSelection(element: any) {
+    const originalNextSibling = element.nextElementSibling;
 
-  private removeFilter(filter: string, option: string) {
-    const selectedFilters = this.allFilters.selectedFilters[
-      option
-    ] as Set<string>;
-    selectedFilters.delete(filter);
-    this.state.notifyObservers();
+    if (!element.classList.contains("element-selected")) {
+      element.classList.add("element-selected");
+
+      this.dropdownContent.insertBefore(
+        element,
+        this.dropdownContent.firstChild
+      );
+      this.closeCross.style.display = "block";
+
+      this.state.addFilter(element);
+    }
+    if (element.classList.contains("element-selected")) {
+      element.classList.remove("element-selected");
+      this.closeCross.style.display = "none";
+      this.dropdownContent.insertBefore(element, originalNextSibling);
+
+      this.state.removeFilter(element);
+    }
   }
 }

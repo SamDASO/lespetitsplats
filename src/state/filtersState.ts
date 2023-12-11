@@ -1,6 +1,6 @@
 import { IObserver, IObservable } from "../models/observer-interfaces.ts";
 import { Filters } from "../models/filters.ts";
-import { Recipe } from "../models/recipe.ts";
+import { RecipesState } from "./recipesState.ts";
 
 export class FiltersState implements IObservable, IObserver {
   private observers: IObserver[] = [];
@@ -8,8 +8,9 @@ export class FiltersState implements IObservable, IObserver {
     availableFilters: Filters;
     selectedFilters: Filters;
   };
+  private recipesState: RecipesState;
 
-  constructor() {
+  constructor(recipesState: RecipesState) {
     this.filters = {
       availableFilters: {
         ingredients: new Set(),
@@ -22,30 +23,17 @@ export class FiltersState implements IObservable, IObserver {
         ustensils: new Set(),
       },
     };
+    this.recipesState = recipesState;
   }
 
   //Its observable : RecipesState
-  update(recipes: Recipe[]) {
-    this.filters.availableFilters = this.generateFilters(recipes);
-    this.getTotalRecipes(recipes);
-    this.notifyObservers();
+  update(filters: Filters) {
+    this.filters.availableFilters = filters;
+    this.getTotalRecipes();
   }
 
-  private generateFilters(recipes: Recipe[]) {
-    recipes.forEach((recipe) => {
-      recipe.ingredients.forEach((ingredient) => {
-        this.filters.availableFilters.ingredients.add(ingredient.ingredient);
-      });
-      this.filters.availableFilters.appliances.add(recipe.appliance);
-      recipe.ustensils.forEach((ustensil) => {
-        this.filters.availableFilters.ustensils.add(ustensil);
-      });
-    });
-
-    return this.filters.availableFilters;
-  }
-
-  getTotalRecipes(recipes: Recipe[]) {
+  getTotalRecipes() {
+    const recipes = this.recipesState.getRecipesDisplayed();
     return recipes.length;
   }
 
@@ -55,8 +43,39 @@ export class FiltersState implements IObservable, IObserver {
   }
 
   notifyObservers(): void {
+    const filters = this.filters.selectedFilters;
     this.observers.forEach((observer) => {
-      observer.update(this.filters.availableFilters);
+      observer.update(filters);
     });
+  }
+
+  addFilter(filter: string) {
+    const option = this.getFilterOption(filter);
+
+    if (option) {
+      this.filters.selectedFilters[option].add(filter);
+    }
+
+    return this.filters.selectedFilters;
+  }
+
+  removeFilter(filter: string) {
+    const option = this.getFilterOption(filter);
+
+    if (option) {
+      this.filters.selectedFilters[option].delete(filter);
+    }
+
+    return this.filters.selectedFilters;
+  }
+
+  private getFilterOption(filter: string): keyof Filters | undefined {
+    if (this.filters.availableFilters.ingredients.has(filter)) {
+      return "ingredients";
+    } else if (this.filters.availableFilters.appliances.has(filter)) {
+      return "appliances";
+    } else if (this.filters.availableFilters.ustensils.has(filter)) {
+      return "ustensils";
+    }
   }
 }

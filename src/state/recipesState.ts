@@ -5,15 +5,13 @@ import { Filters } from "../models/filters.ts";
 export class RecipesState implements IObservable, IObserver {
   private observers: IObserver[] = [];
   private recipesDisplayed: Recipe[] = [];
-  private allRecipes: Recipe[] = [];
   private filters: {
     availableFilters: Filters;
     selectedFilters: Filters;
   };
 
-  constructor(observers: IObserver[], initialRecipes: Recipe[]) {
-    this.allRecipes = initialRecipes || [];
-    this.recipesDisplayed = this.allRecipes.slice();
+  constructor(observers: IObserver[], recipes: Recipe[]) {
+    this.recipesDisplayed = recipes;
     this.observers = observers;
     this.filters = {
       availableFilters: {
@@ -39,45 +37,65 @@ export class RecipesState implements IObservable, IObserver {
     this.observers.push(observer);
   }
 
-  //Notify the FiltersState and filtersComponent about the recipes that are displayed
+  //Notify the FiltersState
   notifyObservers(): void {
-    let recipesUpdate: Recipe[];
-    if (this.recipesDisplayed.length == 0) {
-      recipesUpdate = this.allRecipes;
-    } else {
-      recipesUpdate = this.recipesDisplayed;
-    }
-    this.observers.forEach((observer) => observer.update(recipesUpdate));
+    this.observers.forEach((observer) => observer.update(this.generateFilters));
   }
 
   //As observer
 
-  update(filters: Filters): Recipe[] {
-    this.filters.availableFilters = filters;
-    this.recipesDisplayed = this.filterRecipes(filters); // recived by filters that have been selected by filter
-    this.notifyObservers(); //notify the Filters
+  update(filters: Filters) {
+    this.filters.selectedFilters = filters;
+    this.updateRecipesAndFilters();
     console.log("update for RecipesState:", filters);
-    return this.recipesDisplayed;
+    this.notifyObservers();
   }
 
-  private filterRecipes(filters: Filters) {
-    this.recipesDisplayed = this.allRecipes.filter((recipe) => {
+  private generateFilters(recipes: Recipe[]) {
+    const newFilters: Filters = {
+      ingredients: new Set(),
+      appliances: new Set(),
+      ustensils: new Set(),
+    };
+
+    recipes.forEach((recipe) => {
+      recipe.ingredients.forEach((ingredient) => {
+        newFilters.ingredients.add(ingredient.ingredient);
+      });
+      newFilters.appliances.add(recipe.appliance);
+      recipe.ustensils.forEach((ustensil) => {
+        newFilters.ustensils.add(ustensil);
+      });
+    });
+
+    return newFilters;
+  }
+
+  //needs to sort its recipes depending on each filters selected received
+
+  private updateRecipesAndFilters() {
+    const selectedFilters = this.filters.selectedFilters;
+
+    // Filter recipes based on selected filters
+    this.recipesDisplayed = this.recipesDisplayed.filter((recipe) => {
       const ingredientsMatch = this.matchIngredients(
         recipe.ingredients,
-        filters.ingredients
+        selectedFilters.ingredients
       );
       const appliancesMatch = this.matchAppliances(
         recipe.appliance,
-        filters.appliances
+        selectedFilters.appliances
       );
       const ustensilsMatch = this.matchUstensils(
         recipe.ustensils,
-        filters.ustensils
+        selectedFilters.ustensils
       );
 
       return ingredientsMatch && appliancesMatch && ustensilsMatch;
     });
-    return this.recipesDisplayed;
+
+    // Update available filters based on the filtered recipes
+    this.filters.availableFilters = this.generateFilters(this.recipesDisplayed);
   }
 
   private matchIngredients(
