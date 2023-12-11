@@ -109,12 +109,14 @@ body {
   width: 100%;
 }
 
-.btn-compartement {
+.btns-compartement {
   display: flex;
   justify-content: space-between;
   gap: 60px;
 }
-.filter-container {
+.dropdown-container {
+  display: none;
+  flex-direction: column;
   width: 163px;
 }
 
@@ -171,7 +173,7 @@ body {
   flex-wrap: wrap;
 }
 
-#dropdown-search {
+.dropdown-search {
   display: flex;
   justify-content: space-between;
   align-items: center;

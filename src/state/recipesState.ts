@@ -1,53 +1,63 @@
 import { IObservable, IObserver } from "../models/observer-interfaces.ts";
 import { Recipe } from "../models/recipe.ts";
 import { Filters } from "../models/filters.ts";
-import { FiltersState } from "./filtersState.ts";
 
 export class RecipesState implements IObservable, IObserver {
   private observers: IObserver[] = [];
   private recipesDisplayed: Recipe[] = [];
-  private readonly allRecipes: Recipe[] = [];
+  private allRecipes: Recipe[] = [];
+  private filters: {
+    availableFilters: Filters;
+    selectedFilters: Filters;
+  };
 
-  constructor(observers: IObserver[], initialRecipes?: Recipe[]) {
+  constructor(observers: IObserver[], initialRecipes: Recipe[]) {
     this.allRecipes = initialRecipes || [];
-    this.recipesDisplayed = this.allRecipes;
+    this.recipesDisplayed = this.allRecipes.slice();
     this.observers = observers;
+    this.filters = {
+      availableFilters: {
+        ingredients: new Set(),
+        appliances: new Set(),
+        ustensils: new Set(),
+      },
+      selectedFilters: {
+        ingredients: new Set(),
+        appliances: new Set(),
+        ustensils: new Set(),
+      },
+    };
   }
 
   //As Observable
-
+  //needs to be observed by the recipeComponent
   getRecipesDisplayed(): Recipe[] {
     return this.recipesDisplayed;
-  }
-
-  getTotalRecipes(): number {
-    return this.recipesDisplayed.length;
   }
 
   addObserver(observer: IObserver): void {
     this.observers.push(observer);
   }
 
-  //Notify the FiltersState about the recipes that are displayed
+  //Notify the FiltersState and filtersComponent about the recipes that are displayed
   notifyObservers(): void {
     let recipesUpdate: Recipe[];
     if (this.recipesDisplayed.length == 0) {
       recipesUpdate = this.allRecipes;
     } else {
-      const filtersState = new FiltersState();
-      recipesUpdate = this.update(
-        filtersState.generatedFiltersFunction(this.allRecipes)
-      );
+      recipesUpdate = this.recipesDisplayed;
     }
-    this.observers.forEach((observer) => observer.update(recipesUpdate, true));
+    this.observers.forEach((observer) => observer.update(recipesUpdate));
   }
 
   //As observer
 
-  update(filters: any): Recipe[] {
-    const updatedRecipes = this.filterRecipes(filters); // recived by filters that have been selected by filter
+  update(filters: Filters): Recipe[] {
+    this.filters.availableFilters = filters;
+    this.recipesDisplayed = this.filterRecipes(filters); // recived by filters that have been selected by filter
     this.notifyObservers(); //notify the Filters
-    return updatedRecipes;
+    console.log("update for RecipesState:", filters);
+    return this.recipesDisplayed;
   }
 
   private filterRecipes(filters: Filters) {

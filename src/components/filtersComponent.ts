@@ -1,5 +1,7 @@
 import { Component } from "../models/component.ts";
+import { Filters } from "../models/filters.ts";
 import { IObserver } from "../models/observer-interfaces.ts";
+import { Recipe } from "../models/recipe.ts";
 import { FiltersState } from "../state/filtersState.ts";
 import { RecipesState } from "../state/recipesState.ts";
 import { FilterComponent } from "./filterComponent.ts";
@@ -8,119 +10,113 @@ import { FilterComponent } from "./filterComponent.ts";
 
 export class FiltersComponent implements Component, IObserver {
   private state: FiltersState;
+  private recipes: Recipe[];
+  private recipesState: RecipesState;
+  private btnArray: string[];
+  private filters: {
+    availableFilters: Filters;
+    selectedFilters: Filters;
+  };
 
-  constructor(state: FiltersState) {
+  constructor(state: FiltersState, recipesState: RecipesState) {
     this.state = state;
+    this.recipesState = recipesState;
+    this.recipes = this.recipesState.getRecipesDisplayed();
+    this.btnArray = ["Ingrédients", "Appareils", "Ustensiles"];
+    this.filters = {
+      availableFilters: {
+        ingredients: new Set(),
+        appliances: new Set(),
+        ustensils: new Set(),
+      },
+      selectedFilters: {
+        ingredients: new Set(),
+        appliances: new Set(),
+        ustensils: new Set(),
+      },
+    };
   }
 
+  //Render the div containing the buttons, the total number's recipe and the display of the selected filters
+  //Observes filtersState and take all the filters to display the selected filters in the container of selected filters
+
   render(): HTMLElement {
+    const filtersSection = document.getElementById("filters");
+
+    /////////////////first layer Filters display (btn + nbr total recipes)
+
     const filtersDisplayFirstLayer = document.createElement("div");
     filtersDisplayFirstLayer.classList.add("filters-compartement");
 
-    //buttons
-    const section = document.getElementById("filters");
+    //container of the buttons
 
     const btnsCompartement = document.createElement("div");
-    btnsCompartement.classList.add("btn-compartement");
+    btnsCompartement.classList.add("btns-compartement");
 
-    const tagsArray: string[] = ["Ingrédients", "Appareils", "Ustensiles"];
+    this.btnArray.forEach((option) => {
+      const filterComponentInstance = new FilterComponent(
+        this.state,
+        option.toLowerCase()
+      );
+      const btnRender = filterComponentInstance.render();
 
-    tagsArray.forEach((option) => {
-      const container = this.createFilterContainer(option);
-      btnsCompartement.appendChild(container);
+      btnsCompartement.appendChild(btnRender);
+      filtersDisplayFirstLayer.appendChild(btnsCompartement);
     });
 
     //Nbr total recipes
-    const recipesStateInstance = new RecipesState([]);
-    const totalRecipes = recipesStateInstance.getTotalRecipes();
+    const totalRecipes = this.state.getTotalRecipes(this.recipes);
     const nbrRecipes = document.createElement("p");
     nbrRecipes.classList.add("nbr-recipes");
     nbrRecipes.textContent = `${totalRecipes} recettes`;
 
-    filtersDisplayFirstLayer.appendChild(btnsCompartement);
     filtersDisplayFirstLayer.appendChild(nbrRecipes);
-    section!.appendChild(filtersDisplayFirstLayer);
-    const selectedFilters = this.state.getSelectedFilters();
 
-    if (selectedFilters.length !== 0) {
-      section!.appendChild(this.displaySectionFilterSelected(selectedFilters));
+    /////////////////second layer Filters display (display the selected elements)
+
+    const filtersDisplaySecondLayer = document.createElement("div");
+    filtersDisplaySecondLayer.classList.add("element-selected-container");
+    const selectedFilters = this.displaySelectedFilterDom();
+
+    if (selectedFilters.length === 0) {
+      filtersDisplaySecondLayer.style.display = "none";
+    } else {
+      filtersDisplaySecondLayer.style.display = "flex";
+      selectedFilters.forEach((element) => {
+        const filterbox = document.createElement("div");
+        filterbox.classList.add("element-selected-box");
+        const filterText = document.createElement("p");
+        filterText.classList.add("element-selected");
+        filterText.textContent = element;
+
+        const crossSVG = document.createElement("img");
+        crossSVG.classList.add("close-element");
+        crossSVG.setAttribute("src", "./assets/icons/simple-cross.svg");
+
+        filterbox.appendChild(filterText);
+        filterbox.appendChild(crossSVG);
+        filtersDisplaySecondLayer.appendChild(filterbox);
+      });
     }
 
-    return section!;
+    filtersSection?.appendChild(filtersDisplayFirstLayer);
+    filtersSection?.appendChild(filtersDisplaySecondLayer);
+
+    return filtersSection!;
   }
 
-  private createFilterContainer(option: string): HTMLDivElement {
-    const filterComponent = new FilterComponent();
-    const containerFilters = document.createElement("div");
-    containerFilters.classList.add("filter-container");
-    containerFilters.classList.add(`filter-container-${option}`);
+  private displaySelectedFilterDom() {
+    const selectedElements = this.filters.selectedFilters;
+    const selectedFilterStrings: string[] = [];
 
-    const buttonTags = document.createElement("button");
-    buttonTags.classList.add("filters-btn");
-    buttonTags.setAttribute("aria-haspopup", "listbox");
-    buttonTags.setAttribute("role", "button");
-    buttonTags.textContent = option;
-
-    const arrowDown = document.createElement("div");
-    arrowDown.classList.add("arrow-down");
-    arrowDown.classList.add("arrow-filter");
-
-    containerFilters.appendChild(buttonTags);
-    buttonTags.appendChild(arrowDown);
-
-    buttonTags.addEventListener("click", () => {
-      const dropdownMenu = filterComponent.render(option);
-      const arrow = arrowDown;
-
-      if (dropdownMenu.style.display === "none") {
-        dropdownMenu.style.display = "flex";
-        buttonTags.style.borderBottomRightRadius = "0";
-        buttonTags.style.borderBottomLeftRadius = "0";
-        arrow.classList.add("arrow-up");
-        arrow.classList.remove("arrow-down");
-      } else {
-        dropdownMenu.style.display = "none";
-        buttonTags.style.borderBottomRightRadius = "11px";
-        buttonTags.style.borderBottomLeftRadius = "11px";
-        arrow.classList.add("arrow-down");
-        arrow.classList.remove("arrow-up");
-      }
-      containerFilters.appendChild(dropdownMenu);
+    Object.values(selectedElements).forEach((filtersSet) => {
+      selectedFilterStrings.push(...Array.from(filtersSet as Set<string>));
     });
 
-    return containerFilters;
+    return selectedFilterStrings;
   }
 
-  displaySectionFilterSelected(selectedFilters: any) {
-    const filterContainer = this.displaySelectedFilterDom(selectedFilters);
-    return filterContainer;
-  }
-
-  displaySelectedFilterDom(selectedElement: string) {
-    const filterContainer = document.createElement("div");
-    filterContainer.classList.add("element-selected-container");
-
-    const filterText = document.createElement("p");
-    filterText.classList.add("element-selected");
-    filterText.textContent = selectedElement;
-
-    const crossSVG = document.createElement("img");
-    crossSVG.setAttribute("src", "./assets/icons/simple-cross.svg");
-
-    filterContainer.appendChild(filterText);
-    filterContainer.appendChild(crossSVG);
-
-    crossSVG.addEventListener("click", () => {
-      // Remove the selected filter and update the FiltersState
-      this.state.toggleSelectedFilters(selectedElement);
-      // Remove the filterContainer from the UI
-      filterContainer.remove();
-    });
-
-    return filterContainer;
-  }
-
-  update() {
-    this.state;
+  update(filters: any) {
+    this.filters = filters;
   }
 }

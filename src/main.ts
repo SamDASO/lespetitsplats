@@ -27,17 +27,21 @@ function init(recipesdata: Recipe[]) {
   const filtersState = new FiltersState();
   const recipesState = new RecipesState([], recipes);
 
+  //observers
+  recipesState.addObserver(filtersState);
+  filtersState.addObserver(recipesState);
+
   // Component initialization
   const recipesComponents: RecipeComponent[] = recipesState
     .getRecipesDisplayed()
     .map((recipe) => new RecipeComponent(recipe));
-  const filtersComponent = new FiltersComponent(filtersState);
+
+  const filtersComponent = new FiltersComponent(filtersState, recipesState);
 
   // Display initial content
   recipesComponents.forEach((component) => {
     component.render();
   });
-  filtersState.update(recipes, true);
   filtersComponent.render();
 
   // display initialisation
@@ -46,14 +50,6 @@ function init(recipesdata: Recipe[]) {
   recipesComponents.forEach((component) => {
     containerElement?.appendChild(component.render());
   });
-
-  // Recipes components observes the recipes state
-  recipesComponents.forEach((component) => {
-    recipesState.addObserver(component);
-  });
-
-  // Filters component observe the filters state
-  filtersState.addObserver(filtersComponent, false);
 }
 
 fetchDataAndInit();

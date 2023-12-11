@@ -3,99 +3,60 @@ import { Filters } from "../models/filters.ts";
 import { Recipe } from "../models/recipe.ts";
 
 export class FiltersState implements IObservable, IObserver {
-  private pageObservers: IObserver[] = [];
-  private filterObservers: IObserver[] = [];
-  private filtersList: Filters; //filters to display according to the recipes updates
-  private selectedFiltersArray: string[] = []; //filters selected to generate the recipes
+  private observers: IObserver[] = [];
+  private filters: {
+    availableFilters: Filters;
+    selectedFilters: Filters;
+  };
 
   constructor() {
-    this.filtersList = {
-      ingredients: new Set(),
-      appliances: new Set(),
-      ustensils: new Set(),
+    this.filters = {
+      availableFilters: {
+        ingredients: new Set(),
+        appliances: new Set(),
+        ustensils: new Set(),
+      },
+      selectedFilters: {
+        ingredients: new Set(),
+        appliances: new Set(),
+        ustensils: new Set(),
+      },
     };
-    this.selectedFiltersArray = [];
   }
 
-  // As observable
-
-  getFiltersToDisplay() {
-    return this.filtersList;
+  //Its observable : RecipesState
+  update(recipes: Recipe[]) {
+    this.filters.availableFilters = this.generateFilters(recipes);
+    this.getTotalRecipes(recipes);
+    this.notifyObservers();
   }
 
-  generatedFiltersFunction(recipes: Recipe[]) {
-    return this.generateFilters(recipes);
-  }
-
-  getSelectedFilters() {
-    return this.selectedFiltersArray;
-  }
-
-  addObserver(observer: IObserver, isPageObserver: boolean): void {
-    if (isPageObserver) {
-      this.pageObservers.push(observer);
-    } else {
-      this.filterObservers.push(observer);
-    }
-  }
-
-  //notify the page with the filters selected if the argument is true, else it will notify the filter about the filters to display
-  notifyObservers(isPageObserver: boolean): void {
-    if (isPageObserver) {
-      this.pageObservers.forEach((observer) => {
-        observer.update(this.selectedFiltersArray);
-      });
-    } else {
-      this.filterObservers.forEach((observer) => {
-        observer.update(this.getFiltersToDisplay);
-      });
-    }
-  }
-
-  // As observer update doit récupérér un Recipe[]
-  update(data: any, isPageObserver: boolean): void {
-    // Notify the appropriate set of observers about the changes, if isPageObserver it will notify the filter
-    if (isPageObserver) {
-      // Update the filters based on the data received by recipes
-
-      this.filtersList = this.generateFilters(data);
-      this.notifyObservers(false);
-    } else {
-      this.toggleSelectedFilters(data);
-      this.notifyObservers(true);
-    }
-  }
-
-  //generate the filters list depending to the recipes that are displayed by recipesState
-  private generateFilters(recipes: Recipe[]): Filters {
-    const filters: Filters = {
-      ingredients: new Set(),
-      appliances: new Set(),
-      ustensils: new Set(),
-    };
-
+  private generateFilters(recipes: Recipe[]) {
     recipes.forEach((recipe) => {
       recipe.ingredients.forEach((ingredient) => {
-        filters.ingredients.add(ingredient.ingredient);
+        this.filters.availableFilters.ingredients.add(ingredient.ingredient);
       });
-      filters.appliances.add(recipe.appliance);
+      this.filters.availableFilters.appliances.add(recipe.appliance);
       recipe.ustensils.forEach((ustensil) => {
-        filters.ustensils.add(ustensil);
+        this.filters.availableFilters.ustensils.add(ustensil);
       });
     });
 
-    return filters;
+    return this.filters.availableFilters;
   }
 
-  public toggleSelectedFilters(filter: string): void {
-    const index = this.selectedFiltersArray.indexOf(filter);
+  getTotalRecipes(recipes: Recipe[]) {
+    return recipes.length;
+  }
 
-    if (index !== -1) {
-      // Filter is already selected, so remove it
-      this.selectedFiltersArray.splice(index, 1);
-    } else {
-      // Filter is not selected, so add it
-      this.selectedFiltersArray.push(filter);
-    }
+  //Its observers : FiltersComponent, FilterComponent and RecipeState send them all the filters
+  addObserver(observer: IObserver): void {
+    this.observers.push(observer);
+  }
+
+  notifyObservers(): void {
+    this.observers.forEach((observer) => {
+      observer.update(this.filters.availableFilters);
+    });
   }
 }
