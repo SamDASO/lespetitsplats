@@ -1,9 +1,8 @@
 import { Component } from "../models/component.ts";
-import { IObserver } from "../models/observer-interfaces.ts";
 import { Filters } from "../models/filters.ts";
 import { FiltersState } from "../state/filtersState.ts";
 
-export class FilterComponent implements Component, IObserver {
+export class FilterComponent implements Component {
   private option: string;
   private state: FiltersState;
   private allFilters: {
@@ -59,33 +58,9 @@ export class FilterComponent implements Component, IObserver {
 
     btnOption.appendChild(filterListContainer);
 
-    //Search bar for option
-
-    const formFilter = document.createElement("form");
-    formFilter.classList.add("dropdown-search");
-    formFilter.id = `dropdown-search-${this.option}`;
-
-    const inputForm = document.createElement("input");
-    inputForm.id = "dropdown-input";
-    inputForm.setAttribute("type", "text");
-    inputForm.setAttribute("name", "search");
-    inputForm.setAttribute("placeholder", "");
-
-    const btnForm = document.createElement("button");
-    btnForm.id = "dropdown-btn";
-    const imgBtnContent = document.createElement("img");
-    imgBtnContent.setAttribute("src", "./assets/icons/search-filter.svg");
-
-    btnForm.appendChild(imgBtnContent);
-    formFilter.appendChild(inputForm);
-    formFilter.appendChild(btnForm);
-
-    filterListContainer.appendChild(formFilter);
-
     //DropdownList
 
-    let filtersDisplay = this.sortFiltersByOptions(this.option);
-    const dropdownList = this.getMenuListDom(filtersDisplay as Filters);
+    const dropdownList = this.getMenuListDom();
 
     filterListContainer.appendChild(dropdownList);
 
@@ -109,53 +84,74 @@ export class FilterComponent implements Component, IObserver {
     });
 
     //Toggle selected filters
-
     return btnOption;
   }
 
-  private getMenuListDom(filters: Filters): HTMLUListElement {
+  private getMenuListDom(): HTMLUListElement {
+    const filtersDisplay = this.sortFiltersByOptions(this.option);
+    this.dropdownContent = document.createElement("ul");
     this.dropdownContent.classList.add("dropdown-content");
     this.dropdownContent.id = `dropdown-content-${this.option}`;
 
-    for (const filterSet of Object.entries(filters)) {
-      filterSet.forEach((filter: string) => {
-        const filterElement = document.createElement("li");
-        filterElement.classList.add("filtered-element-list");
-        filterElement.textContent = filter;
-        const elementText = filter?.replace(/\s+/g, "").toLowerCase();
-        this.closeCross.setAttribute("src", "assets/icons/cross.svg");
-        this.closeCross.classList.add(
-          "close-element",
-          `close-element-${elementText}`
-        );
+    // Search bar
+    const formFilter = document.createElement("form");
+    formFilter.classList.add("dropdown-search");
+    formFilter.id = `dropdown-search-${this.option}`;
 
-        filterElement.addEventListener("click", () => {
-          this.toggleFilterSelection(filterElement);
-        });
+    const inputForm = document.createElement("input");
+    inputForm.id = "dropdown-input";
+    inputForm.setAttribute("type", "text");
+    inputForm.setAttribute("name", "search");
+    inputForm.setAttribute("placeholder", "");
 
-        filterElement.appendChild(this.closeCross);
-        this.dropdownContent.appendChild(filterElement);
+    const btnForm = document.createElement("button");
+    btnForm.id = "dropdown-btn";
+    const imgBtnContent = document.createElement("img");
+    imgBtnContent.setAttribute("src", "./assets/icons/search-filter.svg");
+
+    btnForm.appendChild(imgBtnContent);
+    formFilter.appendChild(inputForm);
+    formFilter.appendChild(btnForm);
+
+    this.dropdownContent.appendChild(formFilter);
+
+    // List items
+    filtersDisplay.forEach((filter: string) => {
+      const filterElement = document.createElement("li");
+      filterElement.classList.add("filtered-element-list");
+      filterElement.textContent = filter;
+
+      const elementText = filter.replace(/\s+/g, "").toLowerCase();
+      this.closeCross.setAttribute("src", "assets/icons/cross.svg");
+      this.closeCross.classList.add(
+        "close-element",
+        `close-element-${elementText}`
+      );
+
+      filterElement.addEventListener("click", () => {
+        this.toggleFilterSelection(filterElement);
       });
-    }
+
+      filterElement.appendChild(this.closeCross);
+      this.dropdownContent.appendChild(filterElement);
+    });
 
     return this.dropdownContent;
   }
 
-  update(filters: Filters) {
-    this.allFilters.availableFilters = filters;
-  }
+  private sortFiltersByOptions(option: string): Set<string> {
+    this.allFilters.availableFilters = this.state.getFiltersAvailable();
 
-  private sortFiltersByOptions(option: string) {
-    if (option.toLowerCase() === "ingrédients") {
-      return this.allFilters.availableFilters.ingredients;
+    switch (option.toLowerCase()) {
+      case "ingrédients":
+        return this.allFilters.availableFilters.ingredients;
+      case "appareils":
+        return this.allFilters.availableFilters.appliances;
+      case "ustensiles":
+        return this.allFilters.availableFilters.ustensils;
+      default:
+        return new Set();
     }
-    if (option.toLowerCase() === "appareils") {
-      return this.allFilters.availableFilters.appliances;
-    }
-    if (option.toLowerCase() === "ustensiles") {
-      return this.allFilters.availableFilters.ustensils;
-    }
-    return this.allFilters.availableFilters;
   }
 
   private toggleFilterSelection(element: any) {

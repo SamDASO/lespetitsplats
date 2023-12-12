@@ -118,21 +118,22 @@ body {
   display: none;
   flex-direction: column;
   max-height: 315px;
-  overflow-y: auto;
   position: absolute;
   z-index: 100;
-  width: 131px;
+  top: 100%;
+  right: 0;
+  width: 163px;
   justify-content: center;
   background-color: white;
   border-bottom-right-radius: 11px;
   border-bottom-left-radius: 11px;
-  padding: 0 16px 14px;
+  padding: 0 0 14px;
   gap: 13px;
-  flex-wrap: wrap;
 }
 
 .filters-btn {
   appearance: none;
+  position: relative;
   border: none;
   box-shadow: none;
   background-color: #fff;
@@ -172,8 +173,14 @@ body {
 .dropdown-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  flex-wrap: wrap;
+  list-style-type: none;
+  align-items: flex-start;
+  text-align: left;
+  max-height: 90%;
+  overflow-y: auto;
+  /* Hide scrollbar for firefox*/
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
 }
 
 .dropdown-search {
@@ -182,11 +189,11 @@ body {
   align-items: center;
   flex-wrap: nowrap;
   padding: 0 10px;
-  width: 90%;
-  height: 36px;
+  min-height: 36px;
   border-radius: 2px;
   background: #fff;
   border: 1px solid #c6c6c6;
+  margin: 0 16px 5px;
 }
 
 #dropdown-input {
@@ -218,14 +225,25 @@ body {
   height: auto;
 }
 
-.filtered-element {
+.filtered-element-list {
   font-size: 14px;
   cursor: pointer;
   padding: 5px;
+  color: black;
+  text-decoration: none;
+  position: relative;
+  margin-left: 16px;
 }
 
-.filtered-element:hover {
+.filtered-element-list:hover::before {
+  content: "";
+  position: absolute;
+  left: -200px;
+  right: -200px;
+  top: 0;
+  bottom: 0;
   background-color: #ffd15b;
+  z-index: -1;
 }
 
 .selected-filtered-element {
@@ -242,10 +260,6 @@ body {
   border-radius: 11px;
 }
 
-.element-selected-list {
-  display: flex;
-  width: 100%;
-}
 .element-selected {
   font-size: 14px;
   color: black;

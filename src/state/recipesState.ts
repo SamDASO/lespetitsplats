@@ -39,7 +39,9 @@ export class RecipesState implements IObservable, IObserver {
 
   //Notify the FiltersState
   notifyObservers(): void {
-    this.observers.forEach((observer) => observer.update(this.generateFilters));
+    this.observers.forEach((observer) =>
+      observer.update(this.generateFilters(this.recipesDisplayed))
+    );
   }
 
   //As observer
@@ -47,7 +49,6 @@ export class RecipesState implements IObservable, IObserver {
   update(filters: Filters) {
     this.filters.selectedFilters = filters;
     this.updateRecipesAndFilters();
-    console.log("update for RecipesState:", filters);
     this.notifyObservers();
   }
 

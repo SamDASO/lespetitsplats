@@ -37,6 +37,9 @@ export class FiltersState implements IObservable, IObserver {
     return recipes.length;
   }
 
+  getFiltersAvailable(){
+    return this.filters.availableFilters;
+  }
   //Its observers : FiltersComponent, FilterComponent and RecipeState send them all the filters
   addObserver(observer: IObserver): void {
     this.observers.push(observer);
