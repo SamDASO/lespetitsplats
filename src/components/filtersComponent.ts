@@ -16,7 +16,7 @@ export class FiltersComponent implements Component, IObserver {
 
   constructor(state: FiltersState) {
     this.state = state;
-    this.btnArray = ["Ingrédients", "Appareils", "Ustensiles"];
+    this.btnArray = ["ingredients", "appliances", "ustensils"];
     this.filters = {
       availableFilters: {
         ingredients: new Set(),

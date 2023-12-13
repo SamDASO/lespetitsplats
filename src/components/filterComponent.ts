@@ -1,43 +1,27 @@
 import { Component } from "../models/component.ts";
-import { Filters } from "../models/filters.ts";
+import { IObserver } from "../models/observer-interfaces.ts";
 import { FiltersState } from "../state/filtersState.ts";
 
-export class FilterComponent implements Component {
+const filterLabels = new Map<string, string>([
+  ["ingredients", "Ingrédients"],
+  ["appliances", "Appareils"],
+  ["ustensils", "Ustensiles"],
+]);
+
+export class FilterComponent implements Component, IObserver {
   private option: string;
   private state: FiltersState;
-  private allFilters: {
-    availableFilters: Filters;
-    selectedFilters: Filters;
-  };
   private dropdownUl: HTMLUListElement;
-  private closeCross: HTMLImageElement;
   private dropdownContent: HTMLDivElement;
   private selectionFilters: HTMLDivElement;
 
   constructor(state: FiltersState, option: string) {
     this.option = option;
     this.state = state;
-    this.allFilters = {
-      availableFilters: {
-        ingredients: new Set(),
-        appliances: new Set(),
-        ustensils: new Set(),
-      },
-      selectedFilters: {
-        ingredients: new Set(),
-        appliances: new Set(),
-        ustensils: new Set(),
-      },
-    };
     this.dropdownUl = document.createElement("ul");
-    this.closeCross = document.createElement("img");
     this.dropdownContent = document.createElement("div");
     this.selectionFilters = document.createElement("div");
   }
-
-  //Render one button, with all it's content and the dropdownMenu depending of the option
-  //Observes filtersState and take all the filters to display in the list
-  // manage the addeventlistener that needs to be looked by it's state
 
   render(): HTMLElement {
     //////////////////button
@@ -47,7 +31,7 @@ export class FilterComponent implements Component {
     btnOption.id = `filters-btn-${this.option}`;
     btnOption.setAttribute("aria-haspopup", "listbox");
     btnOption.setAttribute("role", "button");
-    btnOption.textContent = this.option;
+    btnOption.textContent = filterLabels.get(this.option) ?? "undefined";
 
     const arrowElement = document.createElement("div");
     arrowElement.classList.add("arrow-down");
@@ -87,13 +71,10 @@ export class FilterComponent implements Component {
       }
     });
 
-    //Toggle selected filters
     return filterListContainer;
   }
 
   private getMenuListDom(): HTMLDivElement {
-    const filtersDisplay = this.sortFiltersByOptions(this.option);
-
     this.dropdownContent.classList.add("dropdown-content");
     this.dropdownContent.id = `dropdown-content-${this.option}`;
 
@@ -127,60 +108,49 @@ export class FilterComponent implements Component {
     this.selectionFilters.classList.add("dropdown-selection");
 
     this.dropdownContent.appendChild(this.selectionFilters);
-
-    // List items
-    filtersDisplay.forEach((filter: string) => {
-      const filterElement = document.createElement("li");
-      filterElement.classList.add("filtered-element-list");
-      filterElement.textContent = filter;
-      const elementText = filter?.replace(/\s+/g, "").toLowerCase();
-      this.closeCross.setAttribute("src", "assets/icons/cross.svg");
-      this.closeCross.classList.add(
-        "close-element",
-        `close-element-${elementText}`
-      );
-      filterElement.addEventListener("click", () => {
-        this.toggleFilterSelection(filterElement);
-      });
-
-      filterElement.appendChild(this.closeCross);
-      this.dropdownUl.appendChild(filterElement);
-    });
     this.dropdownContent.appendChild(this.dropdownUl);
+
+    this.renderFiltersList();
 
     return this.dropdownContent;
   }
 
-  private sortFiltersByOptions(option: string): Set<string> {
-    this.allFilters.availableFilters = this.state.getFiltersAvailable();
-
-    switch (option.toLowerCase()) {
-      case "ingrédients":
-        return this.allFilters.availableFilters.ingredients;
-      case "appareils":
-        return this.allFilters.availableFilters.appliances;
-      case "ustensiles":
-        return this.allFilters.availableFilters.ustensils;
-      default:
-        return new Set();
-    }
+  private renderFiltersList() {
+    this.dropdownUl.innerHTML = "";
+    // List items
+    this.state
+      .getFilters()
+      .selectedFilters[this.option].forEach((filter: string) => {
+        this.selectionFilters.append(this.createHtmlListFilter(filter, true));
+      });
+    this.state
+      .getFilters()
+      .availableFilters[this.option].forEach((filter: string) => {
+        this.dropdownUl.append(this.createHtmlListFilter(filter, false));
+      });
   }
 
-  private toggleFilterSelection(element: any) {
-    if (!element.classList.contains("element-selected")) {
-      element.classList.add("element-selected");
-      this.closeCross.style.visibility = "visible";
+  private createHtmlListFilter(filter: string, isSelected: boolean) {
+    const filterElement = document.createElement("li");
+    filterElement.textContent = filter;
 
-      this.selectionFilters.appendChild(element);
+    if (isSelected) {
+      filterElement.classList.add("filtered-element-select");
 
-      this.state.addFilter(element);
+      const elementText = filter?.replace(/\s+/g, "").toLowerCase();
+      const closeCross = document.createElement("img");
+      closeCross.setAttribute("src", "assets/icons/cross.svg");
+      closeCross.classList.add("close-element", `close-element-${elementText}`);
+
+      filterElement.appendChild(closeCross);
     } else {
-      element.classList.remove("element-selected");
-      this.closeCross.style.visibility = "hidden";
-
-      this.dropdownUl.appendChild(element);
-
-      this.state.removeFilter(element);
+      filterElement.classList.add("filtered-element-list");
     }
+
+    return filterElement;
+  }
+
+  public update() {
+    this.renderFiltersList();
   }
 }
