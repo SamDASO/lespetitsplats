@@ -144,7 +144,7 @@ export class FilterComponent implements Component {
       });
 
       filterElement.appendChild(this.closeCross);
-      this.dropdownContent.appendChild(filterElement);
+      this.dropdownUl.appendChild(filterElement);
     });
     this.dropdownContent.appendChild(this.dropdownUl);
 
