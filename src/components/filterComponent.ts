@@ -9,8 +9,10 @@ export class FilterComponent implements Component {
     availableFilters: Filters;
     selectedFilters: Filters;
   };
-  private dropdownContent: HTMLUListElement;
+  private dropdownUl: HTMLUListElement;
   private closeCross: HTMLImageElement;
+  private dropdownContent: HTMLDivElement;
+  private selectionFilters: HTMLDivElement;
 
   constructor(state: FiltersState, option: string) {
     this.option = option;
@@ -27,8 +29,10 @@ export class FilterComponent implements Component {
         ustensils: new Set(),
       },
     };
-    this.dropdownContent = document.createElement("ul");
+    this.dropdownUl = document.createElement("ul");
     this.closeCross = document.createElement("img");
+    this.dropdownContent = document.createElement("div");
+    this.selectionFilters = document.createElement("div");
   }
 
   //Render one button, with all it's content and the dropdownMenu depending of the option
@@ -56,7 +60,7 @@ export class FilterComponent implements Component {
     let filterListContainer = document.createElement("div");
     filterListContainer.classList.add("dropdown-container");
 
-    btnOption.appendChild(filterListContainer);
+    filterListContainer.appendChild(btnOption);
 
     //DropdownList
 
@@ -68,14 +72,14 @@ export class FilterComponent implements Component {
     //button
 
     btnOption.addEventListener("click", () => {
-      if (filterListContainer.style.display === "none") {
-        filterListContainer.style.display = "flex";
+      if (this.dropdownContent.style.display === "none") {
+        this.dropdownContent.style.display = "flex";
         btnOption.style.borderBottomRightRadius = "0";
         btnOption.style.borderBottomLeftRadius = "0";
         arrowElement.classList.add("arrow-up");
         arrowElement.classList.remove("arrow-down");
       } else {
-        filterListContainer.style.display = "none";
+        this.dropdownContent.style.display = "none";
         btnOption.style.borderBottomRightRadius = "11px";
         btnOption.style.borderBottomLeftRadius = "11px";
         arrowElement.classList.add("arrow-down");
@@ -84,14 +88,17 @@ export class FilterComponent implements Component {
     });
 
     //Toggle selected filters
-    return btnOption;
+    return filterListContainer;
   }
 
-  private getMenuListDom(): HTMLUListElement {
+  private getMenuListDom(): HTMLDivElement {
     const filtersDisplay = this.sortFiltersByOptions(this.option);
-    this.dropdownContent = document.createElement("ul");
+
     this.dropdownContent.classList.add("dropdown-content");
     this.dropdownContent.id = `dropdown-content-${this.option}`;
+
+    this.dropdownUl.classList.add("dropdown-ul");
+    this.dropdownUl.id = `dropdown-ul-${this.option}`;
 
     // Search bar
     const formFilter = document.createElement("form");
@@ -115,19 +122,23 @@ export class FilterComponent implements Component {
 
     this.dropdownContent.appendChild(formFilter);
 
+    //Selected elements
+
+    this.selectionFilters.classList.add("dropdown-selection");
+
+    this.dropdownContent.appendChild(this.selectionFilters);
+
     // List items
     filtersDisplay.forEach((filter: string) => {
       const filterElement = document.createElement("li");
       filterElement.classList.add("filtered-element-list");
       filterElement.textContent = filter;
-
-      const elementText = filter.replace(/\s+/g, "").toLowerCase();
+      const elementText = filter?.replace(/\s+/g, "").toLowerCase();
       this.closeCross.setAttribute("src", "assets/icons/cross.svg");
       this.closeCross.classList.add(
         "close-element",
         `close-element-${elementText}`
       );
-
       filterElement.addEventListener("click", () => {
         this.toggleFilterSelection(filterElement);
       });
@@ -135,6 +146,7 @@ export class FilterComponent implements Component {
       filterElement.appendChild(this.closeCross);
       this.dropdownContent.appendChild(filterElement);
     });
+    this.dropdownContent.appendChild(this.dropdownUl);
 
     return this.dropdownContent;
   }
@@ -155,23 +167,18 @@ export class FilterComponent implements Component {
   }
 
   private toggleFilterSelection(element: any) {
-    const originalNextSibling = element.nextElementSibling;
-
     if (!element.classList.contains("element-selected")) {
       element.classList.add("element-selected");
+      this.closeCross.style.visibility = "visible";
 
-      this.dropdownContent.insertBefore(
-        element,
-        this.dropdownContent.firstChild
-      );
-      this.closeCross.style.display = "block";
+      this.selectionFilters.appendChild(element);
 
       this.state.addFilter(element);
-    }
-    if (element.classList.contains("element-selected")) {
+    } else {
       element.classList.remove("element-selected");
-      this.closeCross.style.display = "none";
-      this.dropdownContent.insertBefore(element, originalNextSibling);
+      this.closeCross.style.visibility = "hidden";
+
+      this.dropdownUl.appendChild(element);
 
       this.state.removeFilter(element);
     }

@@ -48,10 +48,7 @@ export class FiltersComponent implements Component, IObserver {
     btnsCompartement.classList.add("btns-compartement");
 
     this.btnArray.forEach((option) => {
-      const filterComponentInstance = new FilterComponent(
-        this.state,
-        option.toLowerCase()
-      );
+      const filterComponentInstance = new FilterComponent(this.state, option);
       const btnRender = filterComponentInstance.render();
 
       btnsCompartement.appendChild(btnRender);
