@@ -1,38 +1,18 @@
 import { Component } from "../models/component.ts";
 import { Filters } from "../models/filters.ts";
-import { IObserver } from "../models/observer-interfaces.ts";
 import { FiltersState } from "../state/filtersState.ts";
 import { FilterComponent } from "./filterComponent.ts";
 
 //Filters DOM
 
-export class FiltersComponent implements Component, IObserver {
+export class FiltersComponent implements Component {
   private state: FiltersState;
   private btnArray: string[];
-  private filters: {
-    availableFilters: Filters;
-    selectedFilters: Filters;
-  };
 
   constructor(state: FiltersState) {
     this.state = state;
     this.btnArray = ["ingredients", "appliances", "ustensils"];
-    this.filters = {
-      availableFilters: {
-        ingredients: new Set(),
-        appliances: new Set(),
-        ustensils: new Set(),
-      },
-      selectedFilters: {
-        ingredients: new Set(),
-        appliances: new Set(),
-        ustensils: new Set(),
-      },
-    };
   }
-
-  //Render the div containing the buttons, the total number's recipe and the display of the selected filters
-  //Observes filtersState and take all the filters to display the selected filters in the container of selected filters
 
   render(): HTMLElement {
     const filtersSection = document.getElementById("filters");
@@ -65,15 +45,36 @@ export class FiltersComponent implements Component, IObserver {
 
     /////////////////second layer Filters display (display the selected elements)
 
-    const filtersDisplaySecondLayer = document.createElement("div");
-    filtersDisplaySecondLayer.classList.add("element-selected-container");
-    const selectedFilters = this.displaySelectedFilterDom();
+    const filtersDisplaySecondLayer = this.getSelectedFiltersSection(
+      this.state.getFilters()
+    );
 
-    if (selectedFilters.length === 0) {
-      filtersDisplaySecondLayer.style.display = "none";
+    if (filtersSection) {
+      filtersSection.appendChild(filtersDisplayFirstLayer);
+      filtersSection.appendChild(filtersDisplaySecondLayer);
+    }
+
+    return filtersSection!;
+  }
+
+  private getSelectedFiltersSection(filters: {
+    availableFilters: Filters;
+    selectedFilters: Filters;
+  }): HTMLDivElement {
+    const selectedSection = document.createElement("div");
+    selectedSection.classList.add("element-selected-container");
+
+    const selectedFilters = filters.selectedFilters;
+
+    const selectedFiltersAsString = Object.values(selectedFilters).flatMap(
+      (filtersSet) => Array.from(filtersSet as Set<string>)
+    );
+
+    if (selectedFiltersAsString.length === 0) {
+      selectedSection.style.display = "none";
     } else {
-      filtersDisplaySecondLayer.style.display = "flex";
-      selectedFilters.forEach((element) => {
+      selectedSection.style.display = "flex";
+      selectedFiltersAsString.forEach((element) => {
         const filterbox = document.createElement("div");
         filterbox.classList.add("element-selected-box");
         const filterText = document.createElement("p");
@@ -86,25 +87,13 @@ export class FiltersComponent implements Component, IObserver {
 
         filterbox.appendChild(filterText);
         filterbox.appendChild(crossSVG);
-        filtersDisplaySecondLayer.appendChild(filterbox);
+        selectedSection.appendChild(filterbox);
       });
     }
-
-    if (filtersSection) {
-      filtersSection.appendChild(filtersDisplayFirstLayer);
-      filtersSection.appendChild(filtersDisplaySecondLayer);
-    }
-
-    return filtersSection!;
+    return selectedSection;
   }
 
-  private displaySelectedFilterDom(): string[] {
-    return Object.values(this.filters.selectedFilters).flatMap((filtersSet) =>
-      Array.from(filtersSet as Set<string>)
-    );
-  }
-
-  update(filters: any) {
-    this.filters.availableFilters = filters;
+  public updateFiltersComponent() {
+    this.render();
   }
 }

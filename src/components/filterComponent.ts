@@ -1,5 +1,4 @@
 import { Component } from "../models/component.ts";
-import { IObserver } from "../models/observer-interfaces.ts";
 import { FiltersState } from "../state/filtersState.ts";
 
 const filterLabels = new Map<string, string>([
@@ -8,7 +7,7 @@ const filterLabels = new Map<string, string>([
   ["ustensils", "Ustensiles"],
 ]);
 
-export class FilterComponent implements Component, IObserver {
+export class FilterComponent implements Component {
   private option: string;
   private state: FiltersState;
   private dropdownUl: HTMLUListElement;
@@ -148,9 +147,5 @@ export class FilterComponent implements Component, IObserver {
     }
 
     return filterElement;
-  }
-
-  public update() {
-    this.renderFiltersList();
   }
 }

@@ -1,6 +1,8 @@
 import { IObserver, IObservable } from "../models/observer-interfaces.ts";
 import { Filters } from "../models/filters.ts";
 import { RecipesState } from "./recipesState.ts";
+import { Recipe } from "../models/recipe.ts";
+import { FiltersComponent } from "../components/filtersComponent.ts";
 
 export class FiltersState implements IObservable, IObserver {
   private observers: IObserver[] = [];
@@ -9,6 +11,7 @@ export class FiltersState implements IObservable, IObserver {
     selectedFilters: Filters;
   };
   private recipesState: RecipesState;
+  private filtersComponent: FiltersComponent;
 
   constructor(recipesState: RecipesState) {
     this.filters = {
@@ -24,11 +27,12 @@ export class FiltersState implements IObservable, IObserver {
       },
     };
     this.recipesState = recipesState;
+    this.filtersComponent = new FiltersComponent(this);
   }
 
   //Its observable : RecipesState
-  update(filters: Filters) {
-    this.filters.availableFilters = filters;
+  update(recipes: Recipe[]) {
+    this.generateFilters(recipes);
     this.getTotalRecipes();
   }
 
@@ -38,39 +42,40 @@ export class FiltersState implements IObservable, IObserver {
   }
 
   getFilters() {
+    this.toogleFiltersSelection();
     return this.filters;
   }
 
-  //Its observers : FiltersComponent, FilterComponent and RecipeState send them all the filters
+  //Its observers : RecipeState send them all the filters
   addObserver(observer: IObserver): void {
     this.observers.push(observer);
   }
 
   notifyObservers(): void {
-    const filters = this.filters.selectedFilters;
+    const filters = this.filters;
     this.observers.forEach((observer) => {
       observer.update(filters);
     });
   }
 
-  addFilter(filter: string) {
-    const option = this.getFilterOption(filter);
+  private generateFilters(recipes: Recipe[]) {
+    const availableFilters: Filters = {
+      ingredients: new Set(),
+      appliances: new Set(),
+      ustensils: new Set(),
+    };
 
-    if (option) {
-      this.filters.selectedFilters[option].add(filter);
-    }
+    this.filters.availableFilters = availableFilters;
 
-    return this.filters.selectedFilters;
-  }
-
-  removeFilter(filter: string) {
-    const option = this.getFilterOption(filter);
-
-    if (option) {
-      this.filters.selectedFilters[option].delete(filter);
-    }
-
-    return this.filters.selectedFilters;
+    recipes.forEach((recipe) => {
+      recipe.ingredients.forEach((ingredient) => {
+        availableFilters.ingredients.add(ingredient.ingredient);
+      });
+      availableFilters.appliances.add(recipe.appliance);
+      recipe.ustensils.forEach((ustensil) => {
+        availableFilters.ustensils.add(ustensil);
+      });
+    });
   }
 
   private getFilterOption(filter: string): keyof Filters | undefined {
@@ -81,5 +86,36 @@ export class FiltersState implements IObservable, IObserver {
     } else if (this.filters.availableFilters.ustensils.has(filter)) {
       return "ustensils";
     }
+  }
+
+  //Faire la fonction toogle + les updates public à actionner
+
+  public toogleFiltersSelection() {
+    const filtersElement = document.querySelectorAll(".filtered-element-list");
+
+    filtersElement.forEach((element) => {
+      element.addEventListener("click", () => {
+        const filterText = element.textContent;
+
+        if (filterText) {
+          const option = this.getFilterOption(filterText);
+
+          if (option) {
+            if (this.filters.availableFilters[option].has(filterText)) {
+              // Move the filter from availableFilters to selectedFilters
+              this.filters.availableFilters[option].delete(filterText);
+              this.filters.selectedFilters[option].add(filterText);
+            } else if (this.filters.selectedFilters[option].has(filterText)) {
+              // Move the filter from selectedFilters to availableFilters
+              this.filters.selectedFilters[option].delete(filterText);
+              this.filters.availableFilters[option].add(filterText);
+            }
+          }
+        }
+        this.filtersComponent.updateFiltersComponent();
+      });
+    });
+
+    this.notifyObservers();
   }
 }
