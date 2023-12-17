@@ -28,6 +28,7 @@ export class FiltersState implements IObservable, IObserver {
     };
     this.recipesState = recipesState;
     this.filtersComponent = new FiltersComponent(this);
+    this.toogleFiltersSelection();
   }
 
   //Its observable : RecipesState
@@ -58,6 +59,7 @@ export class FiltersState implements IObservable, IObserver {
     });
   }
 
+  //TOLOWERCASE
   private generateFilters(recipes: Recipe[]) {
     const availableFilters: Filters = {
       ingredients: new Set(),
@@ -69,11 +71,11 @@ export class FiltersState implements IObservable, IObserver {
 
     recipes.forEach((recipe) => {
       recipe.ingredients.forEach((ingredient) => {
-        availableFilters.ingredients.add(ingredient.ingredient);
+        availableFilters.ingredients.add(ingredient.ingredient.toLowerCase());
       });
-      availableFilters.appliances.add(recipe.appliance);
+      availableFilters.appliances.add(recipe.appliance.toLowerCase());
       recipe.ustensils.forEach((ustensil) => {
-        availableFilters.ustensils.add(ustensil);
+        availableFilters.ustensils.add(ustensil.toLowerCase());
       });
     });
   }
@@ -88,32 +90,35 @@ export class FiltersState implements IObservable, IObserver {
     }
   }
 
-  //Faire la fonction toogle + les updates public à actionner
+  private clickHandler(element: Element) {
+    const filterText = element.textContent;
+
+    if (filterText) {
+      const option = this.getFilterOption(filterText);
+
+      if (option) {
+        if (this.filters.availableFilters[option].has(filterText)) {
+          // Move the filter from availableFilters to selectedFilters
+          this.filters.availableFilters[option].delete(filterText);
+          this.filters.selectedFilters[option].add(filterText);
+        } else if (this.filters.selectedFilters[option].has(filterText)) {
+          // Move the filter from selectedFilters to availableFilters
+          this.filters.selectedFilters[option].delete(filterText);
+          this.filters.availableFilters[option].add(filterText);
+        }
+
+        this.filtersComponent.updateFiltersComponent();
+        this.notifyObservers();
+      }
+    }
+  }
 
   public toogleFiltersSelection() {
     const filtersElement = document.querySelectorAll(".filtered-element-list");
 
     filtersElement.forEach((element) => {
-      element.addEventListener("click", () => {
-        const filterText = element.textContent;
-
-        if (filterText) {
-          const option = this.getFilterOption(filterText);
-
-          if (option) {
-            if (this.filters.availableFilters[option].has(filterText)) {
-              // Move the filter from availableFilters to selectedFilters
-              this.filters.availableFilters[option].delete(filterText);
-              this.filters.selectedFilters[option].add(filterText);
-            } else if (this.filters.selectedFilters[option].has(filterText)) {
-              // Move the filter from selectedFilters to availableFilters
-              this.filters.selectedFilters[option].delete(filterText);
-              this.filters.availableFilters[option].add(filterText);
-            }
-          }
-        }
-        this.filtersComponent.updateFiltersComponent();
-      });
+      element.removeEventListener("click", () => this.clickHandler(element));
+      element.addEventListener("click", () => this.clickHandler(element));
     });
 
     this.notifyObservers();

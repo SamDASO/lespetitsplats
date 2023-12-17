@@ -282,21 +282,24 @@ body {
 }
 
 .element-selected-container {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
+  gap: 15px;
+}
+
+.element-selected-box {
+  display: flex;
   background-color: #ffd15b;
-  display: inline-flex;
   padding: 17px 18px;
   align-items: center;
-  gap: 60px;
   border-radius: 11px;
+  gap: 60px;
 }
 
 .element-selected {
   font-size: 14px;
   color: black;
-}
-
-.close-element {
-  visibility: hidden;
 }
 
 .nbr-recipes {

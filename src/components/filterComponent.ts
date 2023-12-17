@@ -40,7 +40,7 @@ export class FilterComponent implements Component {
 
     //////////////////Filters menu list
 
-    let filterListContainer = document.createElement("div");
+    const filterListContainer = document.createElement("div");
     filterListContainer.classList.add("dropdown-container");
 
     filterListContainer.appendChild(btnOption);
@@ -57,20 +57,20 @@ export class FilterComponent implements Component {
     btnOption.addEventListener("click", () => {
       if (this.dropdownContent.style.display === "none") {
         this.dropdownContent.style.display = "flex";
-        btnOption.style.borderBottomRightRadius = "0";
-        btnOption.style.borderBottomLeftRadius = "0";
+        btnOption!.style.borderBottomRightRadius = "0";
+        btnOption!.style.borderBottomLeftRadius = "0";
         arrowElement.classList.add("arrow-up");
         arrowElement.classList.remove("arrow-down");
       } else {
         this.dropdownContent.style.display = "none";
-        btnOption.style.borderBottomRightRadius = "11px";
-        btnOption.style.borderBottomLeftRadius = "11px";
+        btnOption!.style.borderBottomRightRadius = "11px";
+        btnOption!.style.borderBottomLeftRadius = "11px";
         arrowElement.classList.add("arrow-down");
         arrowElement.classList.remove("arrow-up");
       }
     });
 
-    return filterListContainer;
+    return filterListContainer!;
   }
 
   private getMenuListDom(): HTMLDivElement {
@@ -116,17 +116,28 @@ export class FilterComponent implements Component {
 
   private renderFiltersList() {
     this.dropdownUl.innerHTML = "";
-    // List items
-    this.state
-      .getFilters()
-      .selectedFilters[this.option].forEach((filter: string) => {
-        this.selectionFilters.append(this.createHtmlListFilter(filter, true));
-      });
-    this.state
-      .getFilters()
-      .availableFilters[this.option].forEach((filter: string) => {
-        this.dropdownUl.append(this.createHtmlListFilter(filter, false));
-      });
+    this.selectionFilters.innerHTML = "";
+
+    const selectedFilters =
+      this.state.getFilters().selectedFilters[this.option];
+    const availableFiltersSet =
+      this.state.getFilters().availableFilters[this.option];
+
+    // List items - selected Filters
+    selectedFilters.forEach((filter: string) => {
+      this.selectionFilters.appendChild(
+        this.createHtmlListFilter(filter, true)
+      );
+    });
+
+    //List items - available Filters
+    const sortedAvailableFilters = [...availableFiltersSet].sort((a, b) =>
+      a.localeCompare(b)
+    );
+
+    sortedAvailableFilters.forEach((filter: string) => {
+      this.dropdownUl.appendChild(this.createHtmlListFilter(filter, false));
+    });
   }
 
   private createHtmlListFilter(filter: string, isSelected: boolean) {

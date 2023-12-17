@@ -8,10 +8,16 @@ import { FilterComponent } from "./filterComponent.ts";
 export class FiltersComponent implements Component {
   private state: FiltersState;
   private btnArray: string[];
+  private selectedSection: HTMLDivElement;
+  private filterComponents: FilterComponent[];
 
   constructor(state: FiltersState) {
     this.state = state;
     this.btnArray = ["ingredients", "appliances", "ustensils"];
+    this.selectedSection = document.createElement("div");
+    this.filterComponents = this.btnArray.map(
+      (option) => new FilterComponent(this.state, option)
+    );
   }
 
   render(): HTMLElement {
@@ -19,35 +25,48 @@ export class FiltersComponent implements Component {
 
     /////////////////first layer Filters display (btn + nbr total recipes)
 
-    const filtersDisplayFirstLayer = document.createElement("div");
-    filtersDisplayFirstLayer.classList.add("filters-compartement");
+    let filtersDisplayFirstLayer = document.getElementById(
+      "filtersDisplayFirstLayer"
+    ) as HTMLDivElement;
 
-    //container of the buttons
+    if (!filtersDisplayFirstLayer) {
+      filtersDisplayFirstLayer = document.createElement("div");
+      filtersDisplayFirstLayer.id = "filtersDisplayFirstLayer";
+      filtersDisplayFirstLayer.classList.add("filters-compartement");
 
-    const btnsCompartement = document.createElement("div");
-    btnsCompartement.classList.add("btns-compartement");
+      const btnsCompartement = document.createElement("div");
+      btnsCompartement.classList.add("btns-compartement");
 
-    this.btnArray.forEach((option) => {
-      const filterComponentInstance = new FilterComponent(this.state, option);
-      const btnRender = filterComponentInstance.render();
+      //container of the buttons
 
-      btnsCompartement.appendChild(btnRender);
+      this.filterComponents.forEach((filterComponent) => {
+        const btnRender = filterComponent.render();
+        btnsCompartement.appendChild(btnRender);
+      });
+
+      //Nbr total recipes
+      const totalRecipes = this.state.getTotalRecipes();
+      const nbrRecipes = document.createElement("p");
+      nbrRecipes.classList.add("nbr-recipes");
+      nbrRecipes.textContent = `${totalRecipes} recettes`;
       filtersDisplayFirstLayer.appendChild(btnsCompartement);
-    });
-
-    //Nbr total recipes
-    const totalRecipes = this.state.getTotalRecipes();
-    const nbrRecipes = document.createElement("p");
-    nbrRecipes.classList.add("nbr-recipes");
-    nbrRecipes.textContent = `${totalRecipes} recettes`;
-
-    filtersDisplayFirstLayer.appendChild(nbrRecipes);
+      filtersDisplayFirstLayer.appendChild(nbrRecipes);
+    }
 
     /////////////////second layer Filters display (display the selected elements)
 
-    const filtersDisplaySecondLayer = this.getSelectedFiltersSection(
+    const filtersDisplaySecondLayer = this.selectedSection;
+    filtersDisplaySecondLayer.classList.add("element-selected-container");
+    filtersDisplaySecondLayer.innerHTML = "";
+
+    const filtersSelectedBoxes = this.getSelectedFiltersSection(
       this.state.getFilters()
     );
+
+    // Append each filter box individually
+    filtersSelectedBoxes.forEach((filterBox) => {
+      filtersDisplaySecondLayer.appendChild(filterBox);
+    });
 
     if (filtersSection) {
       filtersSection.appendChild(filtersDisplayFirstLayer);
@@ -60,37 +79,44 @@ export class FiltersComponent implements Component {
   private getSelectedFiltersSection(filters: {
     availableFilters: Filters;
     selectedFilters: Filters;
-  }): HTMLDivElement {
-    const selectedSection = document.createElement("div");
-    selectedSection.classList.add("element-selected-container");
-
+  }): HTMLDivElement[] {
     const selectedFilters = filters.selectedFilters;
 
     const selectedFiltersAsString = Object.values(selectedFilters).flatMap(
       (filtersSet) => Array.from(filtersSet as Set<string>)
     );
 
+    const filterBoxes: HTMLDivElement[] = [];
+
+    selectedFiltersAsString.forEach((element) => {
+      const filterBox = this.createFilterBox(element);
+      filterBoxes.push(filterBox);
+    });
+
     if (selectedFiltersAsString.length === 0) {
-      selectedSection.style.display = "none";
+      this.selectedSection.style.display = "none";
     } else {
-      selectedSection.style.display = "flex";
-      selectedFiltersAsString.forEach((element) => {
-        const filterbox = document.createElement("div");
-        filterbox.classList.add("element-selected-box");
-        const filterText = document.createElement("p");
-        filterText.classList.add("element-selected");
-        filterText.textContent = element;
-
-        const crossSVG = document.createElement("img");
-        crossSVG.classList.add("close-element");
-        crossSVG.setAttribute("src", "./assets/icons/simple-cross.svg");
-
-        filterbox.appendChild(filterText);
-        filterbox.appendChild(crossSVG);
-        selectedSection.appendChild(filterbox);
-      });
+      this.selectedSection.style.display = "flex";
     }
-    return selectedSection;
+
+    return filterBoxes;
+  }
+
+  private createFilterBox(element: string): HTMLDivElement {
+    const filterBox = document.createElement("div");
+    filterBox.classList.add("element-selected-box");
+    const filterText = document.createElement("p");
+    filterText.classList.add("element-selected");
+    filterText.textContent = element;
+
+    const crossSVG = document.createElement("img");
+    crossSVG.classList.add("close-element");
+    crossSVG.setAttribute("src", "../assets/icons/simple-cross.svg");
+
+    filterBox.appendChild(filterText);
+    filterBox.appendChild(crossSVG);
+
+    return filterBox;
   }
 
   public updateFiltersComponent() {

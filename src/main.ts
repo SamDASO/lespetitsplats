@@ -20,8 +20,8 @@ async function fetchDataAndInit() {
 
 ///////////////////////////////////INIT FUNCTION
 
-function init(recipesdata: Recipe[]) {
-  const recipes = recipesdata;
+function init(recipesData: Recipe[]) {
+  const recipes = recipesData;
 
   //state initialisation
   const recipesState = new RecipesState([], recipes);
@@ -44,6 +44,7 @@ function init(recipesdata: Recipe[]) {
   });
   recipesState.notifyObservers();
   filtersComponent.render();
+  filtersState.toogleFiltersSelection();
 
   // display initialisation
   const containerElement = document.getElementById("recipes-section");
