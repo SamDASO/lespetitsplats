@@ -28,7 +28,6 @@ export class FiltersState implements IObservable, IObserver {
     };
     this.recipesState = recipesState;
     this.filtersComponent = new FiltersComponent(this);
-    this.toogleFiltersSelection();
   }
 
   //Its observable : RecipesState
@@ -43,7 +42,6 @@ export class FiltersState implements IObservable, IObserver {
   }
 
   getFilters() {
-    this.toogleFiltersSelection();
     return this.filters;
   }
 
@@ -80,47 +78,89 @@ export class FiltersState implements IObservable, IObserver {
     });
   }
 
-  private getFilterOption(filter: string): keyof Filters | undefined {
-    if (this.filters.availableFilters.ingredients.has(filter)) {
-      return "ingredients";
-    } else if (this.filters.availableFilters.appliances.has(filter)) {
-      return "appliances";
-    } else if (this.filters.availableFilters.ustensils.has(filter)) {
-      return "ustensils";
+  private getFilterOptionAvailableFilters(
+    availableFilter: string
+  ): keyof Filters {
+    let option;
+    if (this.filters.availableFilters.ingredients.has(availableFilter)) {
+      option = "ingredients";
+    } else if (this.filters.availableFilters.appliances.has(availableFilter)) {
+      option = "appliances";
+    } else if (this.filters.availableFilters.ustensils.has(availableFilter)) {
+      option = "ustensils";
     }
+    return option!;
   }
 
-  private clickHandler(element: Element) {
-    const filterText = element.textContent;
-
-    if (filterText) {
-      const option = this.getFilterOption(filterText);
-
-      if (option) {
-        if (this.filters.availableFilters[option].has(filterText)) {
-          // Move the filter from availableFilters to selectedFilters
-          this.filters.availableFilters[option].delete(filterText);
-          this.filters.selectedFilters[option].add(filterText);
-        } else if (this.filters.selectedFilters[option].has(filterText)) {
-          // Move the filter from selectedFilters to availableFilters
-          this.filters.selectedFilters[option].delete(filterText);
-          this.filters.availableFilters[option].add(filterText);
-        }
-
-        this.filtersComponent.updateFiltersComponent();
-        this.notifyObservers();
-      }
+  private getFilterOptionSelectedFilters(
+    selectedFilter: string
+  ): keyof Filters {
+    let option;
+    if (this.filters.selectedFilters.ingredients.has(selectedFilter)) {
+      option = "ingredients";
+    } else if (this.filters.selectedFilters.appliances.has(selectedFilter)) {
+      option = "appliances";
+    } else if (this.filters.selectedFilters.ustensils.has(selectedFilter)) {
+      option = "ustensils";
     }
+    return option!;
   }
 
-  public toogleFiltersSelection() {
+  public toggleFiltersSelection() {
     const filtersElement = document.querySelectorAll(".filtered-element-list");
 
     filtersElement.forEach((element) => {
-      element.removeEventListener("click", () => this.clickHandler(element));
-      element.addEventListener("click", () => this.clickHandler(element));
-    });
+      element.addEventListener("click", () => {
+        const filterText = element.textContent as string;
 
+        console.log(
+          "toogle function element text content:",
+          element.textContent,
+          "and element:",
+          element
+        );
+
+        const optionAvailableFilters = this.getFilterOptionAvailableFilters(
+          filterText
+        ) as keyof Filters;
+
+        const optionSelectedFilters = this.getFilterOptionSelectedFilters(
+          filterText
+        ) as keyof Filters;
+
+        if (
+          this.filters.availableFilters[optionAvailableFilters].has(filterText)
+        ) {
+          this.clickHandlerAvailableFilters(filterText, optionAvailableFilters);
+        } else if (
+          this.filters.selectedFilters[optionSelectedFilters].has(filterText)
+        ) {
+          this.clickHandlerSelectedFilters(filterText, optionSelectedFilters);
+        }
+      });
+    });
+    this.filtersComponent.updateFiltersComponent();
     this.notifyObservers();
+  }
+
+  private clickHandlerAvailableFilters(
+    filterText: string,
+    option: keyof Filters
+  ) {
+    this.filters.availableFilters[option].delete(filterText);
+    this.filters.selectedFilters[option].add(filterText);
+    console.log("option on clickhandler available filters", option);
+
+    return this.filters;
+  }
+
+  private clickHandlerSelectedFilters(
+    filterText: string,
+    option: keyof Filters
+  ) {
+    // Move the filter from selectedFilters to availableFilters
+    this.filters.selectedFilters[option].delete(filterText);
+    this.filters.availableFilters[option].add(filterText);
+    return this.filters;
   }
 }

@@ -114,7 +114,7 @@ export class FilterComponent implements Component {
     return this.dropdownContent;
   }
 
-  private renderFiltersList() {
+  public renderFiltersList() {
     this.dropdownUl.innerHTML = "";
     this.selectionFilters.innerHTML = "";
 

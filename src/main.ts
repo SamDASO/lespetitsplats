@@ -44,7 +44,6 @@ function init(recipesData: Recipe[]) {
   });
   recipesState.notifyObservers();
   filtersComponent.render();
-  filtersState.toogleFiltersSelection();
 
   // display initialisation
   const containerElement = document.getElementById("recipes-section");
@@ -52,6 +51,7 @@ function init(recipesData: Recipe[]) {
   recipesComponents.forEach((component) => {
     containerElement?.appendChild(component.render());
   });
+  filtersState.toggleFiltersSelection();
 }
 
 fetchDataAndInit();

@@ -10,6 +10,10 @@ export class FiltersComponent implements Component {
   private btnArray: string[];
   private selectedSection: HTMLDivElement;
   private filterComponents: FilterComponent[];
+  private allFilters: {
+    availableFilters: Filters;
+    selectedFilters: Filters;
+  };
 
   constructor(state: FiltersState) {
     this.state = state;
@@ -18,6 +22,7 @@ export class FiltersComponent implements Component {
     this.filterComponents = this.btnArray.map(
       (option) => new FilterComponent(this.state, option)
     );
+    this.allFilters = this.state.getFilters();
   }
 
   render(): HTMLElement {
@@ -60,7 +65,7 @@ export class FiltersComponent implements Component {
     filtersDisplaySecondLayer.innerHTML = "";
 
     const filtersSelectedBoxes = this.getSelectedFiltersSection(
-      this.state.getFilters()
+      this.allFilters
     );
 
     // Append each filter box individually
@@ -120,6 +125,9 @@ export class FiltersComponent implements Component {
   }
 
   public updateFiltersComponent() {
-    this.render();
+    this.allFilters;
+    this.filterComponents.forEach((component) => {
+      component.renderFiltersList();
+    });
   }
 }
