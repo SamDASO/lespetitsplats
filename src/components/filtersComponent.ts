@@ -56,6 +56,8 @@ export class FiltersComponent implements Component {
       nbrRecipes.textContent = `${totalRecipes} recettes`;
       filtersDisplayFirstLayer.appendChild(btnsCompartement);
       filtersDisplayFirstLayer.appendChild(nbrRecipes);
+
+      filtersSection!.appendChild(filtersDisplayFirstLayer);
     }
 
     /////////////////second layer Filters display (display the selected elements)
@@ -74,7 +76,6 @@ export class FiltersComponent implements Component {
     });
 
     if (filtersSection) {
-      filtersSection.appendChild(filtersDisplayFirstLayer);
       filtersSection.appendChild(filtersDisplaySecondLayer);
     }
 
@@ -98,12 +99,6 @@ export class FiltersComponent implements Component {
       filterBoxes.push(filterBox);
     });
 
-    if (selectedFiltersAsString.length === 0) {
-      this.selectedSection.style.display = "none";
-    } else {
-      this.selectedSection.style.display = "flex";
-    }
-
     return filterBoxes;
   }
 
@@ -124,10 +119,10 @@ export class FiltersComponent implements Component {
     return filterBox;
   }
 
-  public updateFiltersComponent() {
-    this.allFilters;
+  public updateFiltersComponent(updatesFilters: any) {
+    this.getSelectedFiltersSection(updatesFilters);
     this.filterComponents.forEach((component) => {
-      component.renderFiltersList();
+      component.updateAllFiltersForFilterComponent();
     });
   }
 }

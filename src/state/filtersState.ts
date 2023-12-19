@@ -78,68 +78,23 @@ export class FiltersState implements IObservable, IObserver {
     });
   }
 
-  private getFilterOptionAvailableFilters(
-    availableFilter: string
-  ): keyof Filters {
-    let option;
-    if (this.filters.availableFilters.ingredients.has(availableFilter)) {
-      option = "ingredients";
-    } else if (this.filters.availableFilters.appliances.has(availableFilter)) {
-      option = "appliances";
-    } else if (this.filters.availableFilters.ustensils.has(availableFilter)) {
-      option = "ustensils";
-    }
-    return option!;
-  }
-
-  private getFilterOptionSelectedFilters(
-    selectedFilter: string
-  ): keyof Filters {
-    let option;
-    if (this.filters.selectedFilters.ingredients.has(selectedFilter)) {
-      option = "ingredients";
-    } else if (this.filters.selectedFilters.appliances.has(selectedFilter)) {
-      option = "appliances";
-    } else if (this.filters.selectedFilters.ustensils.has(selectedFilter)) {
-      option = "ustensils";
-    }
-    return option!;
-  }
-
   public toggleFiltersSelection() {
     const filtersElement = document.querySelectorAll(".filtered-element-list");
 
     filtersElement.forEach((element) => {
       element.addEventListener("click", () => {
         const filterText = element.textContent as string;
+        const option = (element as HTMLElement).dataset.option as keyof Filters;
 
-        console.log(
-          "toogle function element text content:",
-          element.textContent,
-          "and element:",
-          element
-        );
-
-        const optionAvailableFilters = this.getFilterOptionAvailableFilters(
-          filterText
-        ) as keyof Filters;
-
-        const optionSelectedFilters = this.getFilterOptionSelectedFilters(
-          filterText
-        ) as keyof Filters;
-
-        if (
-          this.filters.availableFilters[optionAvailableFilters].has(filterText)
-        ) {
-          this.clickHandlerAvailableFilters(filterText, optionAvailableFilters);
-        } else if (
-          this.filters.selectedFilters[optionSelectedFilters].has(filterText)
-        ) {
-          this.clickHandlerSelectedFilters(filterText, optionSelectedFilters);
+        if (this.filters.availableFilters[option].has(filterText)) {
+          this.clickHandlerAvailableFilters(filterText, option);
+        } else if (this.filters.selectedFilters[option].has(filterText)) {
+          this.clickHandlerSelectedFilters(filterText, option);
         }
+        return this.filters;
       });
     });
-    this.filtersComponent.updateFiltersComponent();
+    this.filtersComponent.updateFiltersComponent(this.filters);
     this.notifyObservers();
   }
 
@@ -149,7 +104,12 @@ export class FiltersState implements IObservable, IObserver {
   ) {
     this.filters.availableFilters[option].delete(filterText);
     this.filters.selectedFilters[option].add(filterText);
+
     console.log("option on clickhandler available filters", option);
+    console.log(
+      "filters list after clicking an available filter",
+      this.filters
+    );
 
     return this.filters;
   }
@@ -161,6 +121,9 @@ export class FiltersState implements IObservable, IObserver {
     // Move the filter from selectedFilters to availableFilters
     this.filters.selectedFilters[option].delete(filterText);
     this.filters.availableFilters[option].add(filterText);
+
+    console.log("option on clickhandler selected filters", option);
+    console.log("filters list after clicking a selected filter", this.filters);
     return this.filters;
   }
 }

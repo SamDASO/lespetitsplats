@@ -142,21 +142,34 @@ export class FilterComponent implements Component {
 
   private createHtmlListFilter(filter: string, isSelected: boolean) {
     const filterElement = document.createElement("li");
+    filterElement.classList.add("filtered-element-list");
+    filterElement.classList.add(`filtered-element-${this.option}`);
     filterElement.textContent = filter;
+    filterElement.dataset.option = this.option;
+
+    const closeCross = document.createElement("img");
 
     if (isSelected) {
       filterElement.classList.add("filtered-element-select");
 
       const elementText = filter?.replace(/\s+/g, "").toLowerCase();
-      const closeCross = document.createElement("img");
+
       closeCross.setAttribute("src", "assets/icons/cross.svg");
       closeCross.classList.add("close-element", `close-element-${elementText}`);
+      closeCross.style.display = "inline-block";
 
       filterElement.appendChild(closeCross);
     } else {
+      filterElement.className = "";
       filterElement.classList.add("filtered-element-list");
+      filterElement.classList.add(`filtered-element-${this.option}`);
+      closeCross.style.display = "none";
     }
 
     return filterElement;
+  }
+
+  public updateAllFiltersForFilterComponent() {
+    this.getMenuListDom();
   }
 }
