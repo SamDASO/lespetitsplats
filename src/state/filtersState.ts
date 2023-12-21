@@ -1,8 +1,6 @@
 import { IObserver, IObservable } from "../models/observer-interfaces.ts";
 import { Filters } from "../models/filters.ts";
 import { RecipesState } from "./recipesState.ts";
-import { Recipe } from "../models/recipe.ts";
-import { FiltersComponent } from "../components/filtersComponent.ts";
 
 export class FiltersState implements IObservable, IObserver {
   private observers: IObserver[] = [];
@@ -11,7 +9,6 @@ export class FiltersState implements IObservable, IObserver {
     selectedFilters: Filters;
   };
   private recipesState: RecipesState;
-  private filtersComponent: FiltersComponent;
 
   constructor(recipesState: RecipesState) {
     this.filters = {
@@ -27,18 +24,15 @@ export class FiltersState implements IObservable, IObserver {
       },
     };
     this.recipesState = recipesState;
-    this.filtersComponent = new FiltersComponent(this);
   }
 
   //Its observable : RecipesState
-  update(recipes: Recipe[]) {
-    this.generateFilters(recipes);
-    this.getTotalRecipes();
+  update() {
+    this.generateFilters();
   }
 
-  getTotalRecipes() {
-    const recipes = this.recipesState.getRecipesDisplayed();
-    return recipes.length;
+  public updateRecipesFunction() {
+    this.recipesState.updateRecipes(this.filters.selectedFilters);
   }
 
   getFilters() {
@@ -51,20 +45,19 @@ export class FiltersState implements IObservable, IObserver {
   }
 
   notifyObservers(): void {
-    const filters = this.filters;
     this.observers.forEach((observer) => {
-      observer.update(filters);
+      observer.update();
     });
+    this.recipesState.updateRecipes(this.filters.selectedFilters);
   }
 
-  //TOLOWERCASE
-  private generateFilters(recipes: Recipe[]) {
+  private generateFilters() {
     const availableFilters: Filters = {
       ingredients: new Set(),
       appliances: new Set(),
       ustensils: new Set(),
     };
-
+    const recipes = this.recipesState.getRecipesDisplayed();
     this.filters.availableFilters = availableFilters;
 
     recipes.forEach((recipe) => {
@@ -78,23 +71,13 @@ export class FiltersState implements IObservable, IObserver {
     });
   }
 
-  public toggleFiltersSelection() {
-    const filtersElement = document.querySelectorAll(".filtered-element-list");
-
-    filtersElement.forEach((element) => {
-      element.addEventListener("click", () => {
-        const filterText = element.textContent as string;
-        const option = (element as HTMLElement).dataset.option as keyof Filters;
-
-        if (this.filters.availableFilters[option].has(filterText)) {
-          this.clickHandlerAvailableFilters(filterText, option);
-        } else if (this.filters.selectedFilters[option].has(filterText)) {
-          this.clickHandlerSelectedFilters(filterText, option);
-        }
-        return this.filters;
-      });
-    });
-    this.filtersComponent.updateFiltersComponent(this.filters);
+  public toggleFiltersSelection(option: string, filterText: string) {
+    if (this.filters.availableFilters[option].has(filterText)) {
+      this.clickHandlerAvailableFilters(filterText, option);
+    } else if (this.filters.selectedFilters[option].has(filterText)) {
+      this.clickHandlerSelectedFilters(filterText, option);
+    }
+    this.updateRecipesFunction();
     this.notifyObservers();
   }
 

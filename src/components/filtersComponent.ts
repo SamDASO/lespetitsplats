@@ -1,28 +1,32 @@
 import { Component } from "../models/component.ts";
-import { Filters } from "../models/filters.ts";
+import { IObservable, IObserver } from "../models/observer-interfaces.ts";
 import { FiltersState } from "../state/filtersState.ts";
+import { RecipesState } from "../state/recipesState.ts";
 import { FilterComponent } from "./filterComponent.ts";
 
 //Filters DOM
 
-export class FiltersComponent implements Component {
-  private state: FiltersState;
+export class FiltersComponent implements Component, IObserver, IObservable {
+  private filtersState: FiltersState;
+  private recipesState: RecipesState;
   private btnArray: string[];
   private selectedSection: HTMLDivElement;
   private filterComponents: FilterComponent[];
-  private allFilters: {
-    availableFilters: Filters;
-    selectedFilters: Filters;
-  };
+  private nbrRecipes: HTMLParagraphElement;
+  private observers: IObserver[] = [];
 
-  constructor(state: FiltersState) {
-    this.state = state;
+  constructor(filtersState: FiltersState, recipesState: RecipesState) {
+    this.filtersState = filtersState;
+    this.recipesState = recipesState;
     this.btnArray = ["ingredients", "appliances", "ustensils"];
     this.selectedSection = document.createElement("div");
-    this.filterComponents = this.btnArray.map(
-      (option) => new FilterComponent(this.state, option)
-    );
-    this.allFilters = this.state.getFilters();
+    this.filterComponents = this.btnArray.map((option) => {
+      const filterComponent = new FilterComponent(this.filtersState, option);
+      this.addObserver(filterComponent);
+      return filterComponent;
+    });
+
+    this.nbrRecipes = document.createElement("p");
   }
 
   render(): HTMLElement {
@@ -49,14 +53,14 @@ export class FiltersComponent implements Component {
         btnsCompartement.appendChild(btnRender);
       });
 
-      //Nbr total recipes
-      const totalRecipes = this.state.getTotalRecipes();
-      const nbrRecipes = document.createElement("p");
-      nbrRecipes.classList.add("nbr-recipes");
-      nbrRecipes.textContent = `${totalRecipes} recettes`;
       filtersDisplayFirstLayer.appendChild(btnsCompartement);
-      filtersDisplayFirstLayer.appendChild(nbrRecipes);
 
+      //Nbr total recipes
+      const totalRecipes = this.recipesState.getRecipesDisplayed().length;
+
+      this.nbrRecipes.textContent = `${totalRecipes} recettes`;
+      this.nbrRecipes.classList.add("nbr-recipes");
+      filtersDisplayFirstLayer.appendChild(this.nbrRecipes);
       filtersSection!.appendChild(filtersDisplayFirstLayer);
     }
 
@@ -64,16 +68,8 @@ export class FiltersComponent implements Component {
 
     const filtersDisplaySecondLayer = this.selectedSection;
     filtersDisplaySecondLayer.classList.add("element-selected-container");
-    filtersDisplaySecondLayer.innerHTML = "";
 
-    const filtersSelectedBoxes = this.getSelectedFiltersSection(
-      this.allFilters
-    );
-
-    // Append each filter box individually
-    filtersSelectedBoxes.forEach((filterBox) => {
-      filtersDisplaySecondLayer.appendChild(filterBox);
-    });
+    this.getSelectedFiltersSection();
 
     if (filtersSection) {
       filtersSection.appendChild(filtersDisplaySecondLayer);
@@ -82,24 +78,38 @@ export class FiltersComponent implements Component {
     return filtersSection!;
   }
 
-  private getSelectedFiltersSection(filters: {
-    availableFilters: Filters;
-    selectedFilters: Filters;
-  }): HTMLDivElement[] {
-    const selectedFilters = filters.selectedFilters;
+  addObserver(observer: IObserver): void {
+    this.observers.push(observer);
+  }
+
+  notifyObservers(): void {
+    this.observers.forEach((observer) => {
+      observer.update();
+    });
+  }
+
+  private updateRecipesCount() {
+    this.nbrRecipes.textContent = "";
+    const totalRecipes = this.recipesState.getRecipesDisplayed().length;
+    this.nbrRecipes.textContent = `${totalRecipes} recettes`;
+  }
+
+  private getSelectedFiltersSection(): HTMLDivElement {
+    const filtersDisplaySecondLayer = this.selectedSection;
+    filtersDisplaySecondLayer.innerHTML = "";
+    const selectedFilters = this.filtersState.getFilters().selectedFilters;
 
     const selectedFiltersAsString = Object.values(selectedFilters).flatMap(
       (filtersSet) => Array.from(filtersSet as Set<string>)
     );
 
-    const filterBoxes: HTMLDivElement[] = [];
-
     selectedFiltersAsString.forEach((element) => {
       const filterBox = this.createFilterBox(element);
-      filterBoxes.push(filterBox);
+
+      filtersDisplaySecondLayer.appendChild(filterBox);
     });
 
-    return filterBoxes;
+    return filtersDisplaySecondLayer;
   }
 
   private createFilterBox(element: string): HTMLDivElement {
@@ -119,10 +129,9 @@ export class FiltersComponent implements Component {
     return filterBox;
   }
 
-  public updateFiltersComponent(updatesFilters: any) {
-    this.getSelectedFiltersSection(updatesFilters);
-    this.filterComponents.forEach((component) => {
-      component.updateAllFiltersForFilterComponent();
-    });
+  update() {
+    this.updateRecipesCount();
+    this.getSelectedFiltersSection();
+    this.notifyObservers();
   }
 }

@@ -1,13 +1,13 @@
 import { IObservable, IObserver } from "../models/observer-interfaces.ts";
 import { Recipe } from "../models/recipe.ts";
-import { Filters } from "../models/filters.ts";
-
-export class RecipesState implements IObservable, IObserver {
+export class RecipesState implements IObservable {
   private observers: IObserver[] = [];
   private recipesDisplayed: Recipe[] = [];
+  private readonly allRecipes: Recipe[];
 
-  constructor(observers: IObserver[], recipes: Recipe[]) {
-    this.recipesDisplayed = recipes;
+  constructor(observers: IObserver[], initialRecipes: Recipe[]) {
+    this.allRecipes = initialRecipes;
+    this.recipesDisplayed = this.allRecipes;
     this.observers = observers;
   }
 
@@ -23,23 +23,14 @@ export class RecipesState implements IObservable, IObserver {
 
   //Notify the FiltersState
   notifyObservers(): void {
-    this.observers.forEach((observer) =>
-      observer.update(this.recipesDisplayed)
-    );
-  }
-
-  //As observer
-
-  update(filters: Filters) {
-    const filtersSelected = filters.selectedFilters;
-    this.updateRecipes(filtersSelected);
+    this.observers.forEach((observer) => observer.update());
   }
 
   //needs to sort its recipes depending on each filters selected received
 
-  private updateRecipes(selectedFilters: any) {
+  public updateRecipes(selectedFilters: any) {
     // Filter recipes based on selected filters
-    this.recipesDisplayed = this.recipesDisplayed.filter((recipe) => {
+    this.recipesDisplayed = this.allRecipes.filter((recipe) => {
       const ingredientsMatch = this.matchIngredients(
         recipe.ingredients,
         selectedFilters.ingredients
@@ -63,29 +54,49 @@ export class RecipesState implements IObservable, IObserver {
     ingredients: { ingredient: string }[],
     filterIngredients: Set<string>
   ): boolean {
+    if (filterIngredients.size === 0) {
+      return true;
+    }
     const recipeIngredients = ingredients.map((ingredient) =>
       ingredient.ingredient.toLowerCase()
     );
-    return (
-      filterIngredients.size === 0 ||
-      recipeIngredients.every((ingredient) => filterIngredients.has(ingredient))
-    );
+
+    for (const filter of filterIngredients) {
+      if (!recipeIngredients.includes(filter)) return false;
+    }
+
+    return true;
   }
 
   private matchAppliances(
     appliance: string,
     filterAppliances: Set<string>
   ): boolean {
-    return filterAppliances.size === 0 || filterAppliances.has(appliance);
+    if (filterAppliances.size === 0) {
+      return true;
+    }
+
+    for (const filter of filterAppliances) {
+      if (!appliance.includes(filter)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   private matchUstensils(
     ustensils: string[],
     filterUstensils: Set<string>
   ): boolean {
-    return (
-      filterUstensils.size === 0 ||
-      ustensils.some((ustensil) => filterUstensils.has(ustensil))
-    );
+    if (filterUstensils.size === 0) {
+      return true;
+    }
+    for (const filter of filterUstensils) {
+      if (!ustensils.includes(filter)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

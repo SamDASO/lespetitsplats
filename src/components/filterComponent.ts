@@ -107,6 +107,8 @@ export class FilterComponent implements Component {
     this.selectionFilters.classList.add("dropdown-selection");
 
     this.dropdownContent.appendChild(this.selectionFilters);
+
+    //dropdownList
     this.dropdownContent.appendChild(this.dropdownUl);
 
     this.renderFiltersList();
@@ -122,6 +124,7 @@ export class FilterComponent implements Component {
       this.state.getFilters().selectedFilters[this.option];
     const availableFiltersSet =
       this.state.getFilters().availableFilters[this.option];
+    console.log("filters their state", this.state.getFilters());
 
     // List items - selected Filters
     selectedFilters.forEach((filter: string) => {
@@ -137,10 +140,14 @@ export class FilterComponent implements Component {
 
     sortedAvailableFilters.forEach((filter: string) => {
       this.dropdownUl.appendChild(this.createHtmlListFilter(filter, false));
+      console.log("dropdownul from renderFiltersList:", this.dropdownUl);
     });
   }
 
-  private createHtmlListFilter(filter: string, isSelected: boolean) {
+  private createHtmlListFilter(
+    filter: string,
+    isSelected: boolean
+  ): HTMLLIElement {
     const filterElement = document.createElement("li");
     filterElement.classList.add("filtered-element-list");
     filterElement.classList.add(`filtered-element-${this.option}`);
@@ -149,27 +156,35 @@ export class FilterComponent implements Component {
 
     const closeCross = document.createElement("img");
 
-    if (isSelected) {
-      filterElement.classList.add("filtered-element-select");
+    filterElement.addEventListener("click", () => {
+      const filterText = filterElement.textContent as string;
 
-      const elementText = filter?.replace(/\s+/g, "").toLowerCase();
+      if (isSelected) {
+        filterElement.classList.add("filtered-element-select");
 
-      closeCross.setAttribute("src", "assets/icons/cross.svg");
-      closeCross.classList.add("close-element", `close-element-${elementText}`);
-      closeCross.style.display = "inline-block";
+        const elementText = filter?.replace(/\s+/g, "").toLowerCase();
 
-      filterElement.appendChild(closeCross);
-    } else {
-      filterElement.className = "";
-      filterElement.classList.add("filtered-element-list");
-      filterElement.classList.add(`filtered-element-${this.option}`);
-      closeCross.style.display = "none";
-    }
+        closeCross.setAttribute("src", "assets/icons/cross.svg");
+        closeCross.classList.add(
+          "close-element",
+          `close-element-${elementText}`
+        );
+        closeCross.style.display = "inline-block";
 
+        filterElement.appendChild(closeCross);
+      } else {
+        filterElement.className = "";
+        filterElement.classList.add("filtered-element-list");
+        filterElement.classList.add(`filtered-element-${this.option}`);
+        closeCross.style.display = "none";
+      }
+
+      this.state.toggleFiltersSelection(this.option, filterText);
+    });
     return filterElement;
   }
 
-  public updateAllFiltersForFilterComponent() {
-    this.getMenuListDom();
+  update() {
+    this.renderFiltersList();
   }
 }

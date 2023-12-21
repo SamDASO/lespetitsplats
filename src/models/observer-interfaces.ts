@@ -1,5 +1,5 @@
 export interface IObserver {
-  update(data: any): void;
+  update(): void;
 }
 
 export interface IObservable {
