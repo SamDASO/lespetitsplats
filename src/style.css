@@ -301,6 +301,7 @@ body {
   align-items: center;
   border-radius: 11px;
   gap: 60px;
+  cursor: pointer;
 }
 
 .element-selected {
