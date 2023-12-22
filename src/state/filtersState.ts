@@ -55,14 +55,26 @@ export class FiltersState implements IObservable, IObserver {
     };
     const recipes = this.recipesState.getRecipesDisplayed();
     this.filters.availableFilters = availableFilters;
+    const selectedFilters = this.filters.selectedFilters;
 
     recipes.forEach((recipe) => {
       recipe.ingredients.forEach((ingredient) => {
-        availableFilters.ingredients.add(ingredient.ingredient.toLowerCase());
+        const ingredientToLowerCase = ingredient.ingredient.toLowerCase();
+        if (!selectedFilters.ingredients.has(ingredientToLowerCase)) {
+          availableFilters.ingredients.add(ingredientToLowerCase);
+        }
       });
-      availableFilters.appliances.add(recipe.appliance.toLowerCase());
+
+      const applianceToLowerCase = recipe.appliance.toLowerCase();
+      if (!selectedFilters.appliances.has(applianceToLowerCase)) {
+        availableFilters.appliances.add(applianceToLowerCase);
+      }
+
       recipe.ustensils.forEach((ustensil) => {
-        availableFilters.ustensils.add(ustensil.toLowerCase());
+        const ustensilToLowerCase = ustensil.toLowerCase();
+        if (!selectedFilters.ustensils.has(ustensilToLowerCase)) {
+          availableFilters.ustensils.add(ustensilToLowerCase);
+        }
       });
     });
   }

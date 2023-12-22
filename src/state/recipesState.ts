@@ -72,15 +72,15 @@ export class RecipesState implements IObservable {
     if (filterIngredients.size === 0) {
       return true;
     }
-    const recipeIngredients = ingredients.map((ingredient) =>
-      ingredient.ingredient.toLowerCase()
+
+    const recipeIngredientSet = new Set(
+      ingredients.map((ingredient) => ingredient.ingredient.toLowerCase())
     );
 
-    for (const filter of filterIngredients) {
-      if (!recipeIngredients.includes(filter)) return false;
-    }
-
-    return true;
+    // Check if the recipe contains all of the selected ingredients
+    return Array.from(filterIngredients).every((filter) =>
+      recipeIngredientSet.has(filter)
+    );
   }
 
   private matchAppliances(
@@ -91,13 +91,9 @@ export class RecipesState implements IObservable {
       return true;
     }
 
-    for (const filter of filterAppliances) {
-      if (!appliance.includes(filter)) {
-        return false;
-      }
-    }
+    const applianceName = appliance.toLowerCase();
 
-    return true;
+    return filterAppliances.has(applianceName);
   }
 
   private matchUstensils(
@@ -107,11 +103,14 @@ export class RecipesState implements IObservable {
     if (filterUstensils.size === 0) {
       return true;
     }
-    for (const filter of filterUstensils) {
-      if (!ustensils.includes(filter)) {
-        return false;
-      }
-    }
-    return true;
+
+    const recipeUstensilSet = new Set(
+      ustensils.map((ustensil) => ustensil.toLowerCase())
+    );
+
+    // Check if the recipe contains all of the selected ustensils
+    return Array.from(filterUstensils).every((filter) =>
+      recipeUstensilSet.has(filter)
+    );
   }
 }

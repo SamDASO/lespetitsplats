@@ -107,6 +107,14 @@ export class FiltersComponent implements Component, IObserver, IObservable {
       const filterBox = this.createFilterBox(element);
 
       filtersDisplaySecondLayer.appendChild(filterBox);
+
+      filterBox.addEventListener("click", () => {
+        filtersDisplaySecondLayer.removeChild(filterBox);
+        const option = Object.keys(selectedFilters).find((key) =>
+          selectedFilters[key].has(element)
+        ) as string;
+        this.filtersState.toggleFiltersSelection(option, element);
+      });
     });
 
     return filtersDisplaySecondLayer;
