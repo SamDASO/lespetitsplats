@@ -1,32 +1,46 @@
-//IMPORTS
+///////////////////////////////////IMPORTS
 
-import { recipes } from "./models/recipes.ts";
-import { getRecipesCardDom } from "./components/recipes-components.ts";
+import { FiltersComponent } from "./components/filtersComponent.ts";
+import { FiltersState } from "./state/filtersState.ts";
+import { RecipesState } from "./state/recipesState.ts";
+import { Recipe } from "./models/recipe.ts";
 
-//DATAS
+///////////////////////////////////DATAS
 
-async function getRecipesData() {
+export async function getRecipesData() {
   const recipesDatas = await fetch("./data/recipes.json");
   return recipesDatas.json();
 }
 
-//DISPLAYS FUNCTIONS
-
-function displayRecipes(recipesArray: recipes[]) {
-  const recipesSection = document.getElementById("recipes-section");
-
-  recipesArray.forEach((recipe: recipes) => {
-    const recipesModel = getRecipesCardDom(recipe);
-
-    recipesSection.appendChild(recipesModel);
-  });
-}
-
-//INIT FUNCTION
-
-async function init() {
+async function fetchDataAndInit() {
   const { recipes } = await getRecipesData();
-  displayRecipes(recipes);
+  init(recipes);
 }
 
-init();
+///////////////////////////////////INIT FUNCTION
+
+function init(recipesData: Recipe[]) {
+  const recipes = recipesData;
+
+  //state initialisation
+  const recipesState = new RecipesState([], recipes);
+  const filtersState = new FiltersState(recipesState);
+
+  // Component initialization
+
+  const filtersComponent = new FiltersComponent(filtersState, recipesState);
+
+  //observers
+  recipesState.addObserver(filtersComponent);
+  recipesState.addObserver(filtersState);
+  filtersState.addObserver(filtersComponent);
+
+  // Display initial content
+  recipesState.notifyObservers();
+  filtersComponent.render();
+
+  // display initialisation
+  recipesState.updateRecipes(filtersState.getFilters().selectedFilters);
+}
+
+fetchDataAndInit();
