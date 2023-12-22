@@ -120,7 +120,7 @@ export class FiltersComponent implements Component, IObserver, IObservable {
     filterText.textContent = element;
 
     const crossSVG = document.createElement("img");
-    crossSVG.classList.add("close-element");
+    crossSVG.classList.add("close-selection");
     crossSVG.setAttribute("src", "../assets/icons/simple-cross.svg");
 
     filterBox.appendChild(filterText);

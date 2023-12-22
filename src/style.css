@@ -276,6 +276,12 @@ body {
   background-color: #ffd15b;
 }
 
+.filtered-element-select {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .selected-filtered-element {
   background-color: #ffd15b;
   font-weight: 700;
@@ -300,6 +306,14 @@ body {
 .element-selected {
   font-size: 14px;
   color: black;
+}
+
+.close-element {
+  display: none;
+}
+
+.filtered-element-list:hover .close-element {
+  display: inline-block;
 }
 
 .nbr-recipes {

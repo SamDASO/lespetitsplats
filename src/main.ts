@@ -1,6 +1,5 @@
 ///////////////////////////////////IMPORTS
 
-import { RecipeComponent } from "./components/recipeComponent.ts";
 import { FiltersComponent } from "./components/filtersComponent.ts";
 import { FiltersState } from "./state/filtersState.ts";
 import { RecipesState } from "./state/recipesState.ts";
@@ -26,20 +25,10 @@ function init(recipesData: Recipe[]) {
   //state initialisation
   const recipesState = new RecipesState([], recipes);
   const filtersState = new FiltersState(recipesState);
-  console.log(
-    "recipesState on main initialised :",
-    recipesState,
-    "and recipes argument",
-    recipes
-  );
-  console.log("filterState on main initialised :", filtersState);
+
   // Component initialization
-  const recipesComponents: RecipeComponent[] = recipesState
-    .getRecipesDisplayed()
-    .map((recipe) => new RecipeComponent(recipe));
 
   const filtersComponent = new FiltersComponent(filtersState, recipesState);
-  console.log("filterscomponent on main initialised :", filtersComponent);
 
   //observers
   recipesState.addObserver(filtersComponent);
@@ -47,18 +36,11 @@ function init(recipesData: Recipe[]) {
   filtersState.addObserver(filtersComponent);
 
   // Display initial content
-  recipesComponents.forEach((component) => {
-    component.render();
-  });
   recipesState.notifyObservers();
   filtersComponent.render();
 
   // display initialisation
-  const containerElement = document.getElementById("recipes-section");
-
-  recipesComponents.forEach((component) => {
-    containerElement?.appendChild(component.render());
-  });
+  recipesState.updateRecipes(filtersState.getFilters().selectedFilters);
 }
 
 fetchDataAndInit();

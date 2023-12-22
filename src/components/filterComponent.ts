@@ -124,7 +124,10 @@ export class FilterComponent implements Component {
       this.state.getFilters().selectedFilters[this.option];
     const availableFiltersSet =
       this.state.getFilters().availableFilters[this.option];
-    console.log("filters their state", this.state.getFilters());
+    console.log(
+      "filters their state in the renderFiltersList from fC",
+      this.state.getFilters()
+    );
 
     // List items - selected Filters
     selectedFilters.forEach((filter: string) => {
@@ -140,7 +143,6 @@ export class FilterComponent implements Component {
 
     sortedAvailableFilters.forEach((filter: string) => {
       this.dropdownUl.appendChild(this.createHtmlListFilter(filter, false));
-      console.log("dropdownul from renderFiltersList:", this.dropdownUl);
     });
   }
 
@@ -155,32 +157,35 @@ export class FilterComponent implements Component {
     filterElement.dataset.option = this.option;
 
     const closeCross = document.createElement("img");
+    const filterText = filterElement.textContent as string;
+
+    if (isSelected) {
+      filterElement.classList.add("filtered-element-select");
+
+      const elementText = filter?.replace(/\s+/g, "").toLowerCase();
+
+      closeCross.setAttribute("src", "assets/icons/cross.svg");
+      closeCross.classList.add("close-element", `close-element-${elementText}`);
+
+      filterElement.appendChild(closeCross);
+    } else {
+      filterElement.className = "";
+      filterElement.classList.add("filtered-element-list");
+      filterElement.classList.add(`filtered-element-${this.option}`);
+    }
 
     filterElement.addEventListener("click", () => {
-      const filterText = filterElement.textContent as string;
-
-      if (isSelected) {
-        filterElement.classList.add("filtered-element-select");
-
-        const elementText = filter?.replace(/\s+/g, "").toLowerCase();
-
-        closeCross.setAttribute("src", "assets/icons/cross.svg");
-        closeCross.classList.add(
-          "close-element",
-          `close-element-${elementText}`
-        );
-        closeCross.style.display = "inline-block";
-
-        filterElement.appendChild(closeCross);
-      } else {
+      if ((filterElement.className = ".filtered-element-select")) {
         filterElement.className = "";
         filterElement.classList.add("filtered-element-list");
         filterElement.classList.add(`filtered-element-${this.option}`);
-        closeCross.style.display = "none";
+        this.state.toggleFiltersSelection(this.option, filterText);
+      } else {
+        filterElement.appendChild(closeCross);
+        this.state.toggleFiltersSelection(this.option, filterText);
       }
-
-      this.state.toggleFiltersSelection(this.option, filterText);
     });
+
     return filterElement;
   }
 

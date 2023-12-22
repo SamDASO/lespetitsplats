@@ -31,10 +31,6 @@ export class FiltersState implements IObservable, IObserver {
     this.generateFilters();
   }
 
-  public updateRecipesFunction() {
-    this.recipesState.updateRecipes(this.filters.selectedFilters);
-  }
-
   getFilters() {
     return this.filters;
   }
@@ -77,7 +73,7 @@ export class FiltersState implements IObservable, IObserver {
     } else if (this.filters.selectedFilters[option].has(filterText)) {
       this.clickHandlerSelectedFilters(filterText, option);
     }
-    this.updateRecipesFunction();
+    this.recipesState.updateRecipes(this.filters.selectedFilters);
     this.notifyObservers();
   }
 
@@ -88,8 +84,9 @@ export class FiltersState implements IObservable, IObserver {
     this.filters.availableFilters[option].delete(filterText);
     this.filters.selectedFilters[option].add(filterText);
 
-    console.log("option on clickhandler available filters", option);
     console.log(
+      "option on clickhandler available filters",
+      option,
       "filters list after clicking an available filter",
       this.filters
     );
@@ -105,8 +102,12 @@ export class FiltersState implements IObservable, IObserver {
     this.filters.selectedFilters[option].delete(filterText);
     this.filters.availableFilters[option].add(filterText);
 
-    console.log("option on clickhandler selected filters", option);
-    console.log("filters list after clicking a selected filter", this.filters);
+    console.log(
+      "option on clickhandler selected filters",
+      option,
+      "filters list after clicking a selected filter",
+      this.filters
+    );
     return this.filters;
   }
 }

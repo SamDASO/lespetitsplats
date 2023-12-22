@@ -1,3 +1,4 @@
+import { RecipeComponent } from "../components/recipeComponent.ts";
 import { IObservable, IObserver } from "../models/observer-interfaces.ts";
 import { Recipe } from "../models/recipe.ts";
 export class RecipesState implements IObservable {
@@ -46,7 +47,21 @@ export class RecipesState implements IObservable {
 
       return ingredientsMatch && appliancesMatch && ustensilsMatch;
     });
+    console.log("updates recipes after toggle:", this.recipesDisplayed);
 
+    //update recipeComponent with the new recipesDisplayed array
+    const containerElement = document.getElementById("recipes-section");
+    containerElement!.innerHTML = "";
+    const recipesComponents: RecipeComponent[] = this.recipesDisplayed.map(
+      (recipe) => new RecipeComponent(recipe)
+    );
+    recipesComponents.forEach((component) => {
+      component.render();
+    });
+
+    recipesComponents.forEach((component) => {
+      containerElement?.appendChild(component.render());
+    });
     this.notifyObservers();
   }
 
