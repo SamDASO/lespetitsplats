@@ -6,7 +6,7 @@ import { FilterComponent } from "./filterComponent.ts";
 
 //Filters DOM
 
-export class FiltersComponent implements Component, IObserver, IObservable {
+export class FiltersContainer implements Component, IObserver, IObservable {
   private filtersState: FiltersState;
   private recipesState: RecipesState;
   private btnArray: string[];
