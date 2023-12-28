@@ -5,6 +5,7 @@ export class RecipesState implements IObservable {
   private observers: IObserver[] = [];
   private recipesDisplayed: Recipe[] = [];
   private readonly allRecipes: Recipe[];
+  private previousRecipesDisplayed: Recipe[] = [];
 
   constructor(observers: IObserver[], initialRecipes: Recipe[]) {
     this.allRecipes = initialRecipes;
@@ -47,7 +48,29 @@ export class RecipesState implements IObservable {
 
       return ingredientsMatch && appliancesMatch && ustensilsMatch;
     });
-    console.log("updates recipes after toggle:", this.recipesDisplayed);
+
+    this.notifyObservers();
+  }
+
+  updateRecipesWithSearchTerm(searchTerm: string) {
+    this.recipesDisplayed = [...this.allRecipes];
+
+    // If the search term is at least 3 characters, filter the recipes
+    if (searchTerm.length >= 3) {
+      searchTerm = searchTerm.toLowerCase();
+
+      this.recipesDisplayed = this.recipesDisplayed.filter((recipe) => {
+        const nameMatch = recipe.name.toLowerCase().includes(searchTerm);
+        const descriptionMatch = recipe.description
+          .toLowerCase()
+          .includes(searchTerm);
+        const ingredientMatch = recipe.ingredients.some((ingredient) =>
+          ingredient.ingredient.toLowerCase().includes(searchTerm)
+        );
+
+        return nameMatch || descriptionMatch || ingredientMatch;
+      });
+    }
 
     this.notifyObservers();
   }
@@ -99,5 +122,21 @@ export class RecipesState implements IObservable {
     return Array.from(filterUstensils).every((filter) =>
       recipeUstensilSet.has(filter)
     );
+  }
+
+  public matchText(searchTerm: string) {
+    if (searchTerm.length >= 3) {
+      this.updateRecipesWithSearchTerm(searchTerm);
+      // Save the current state of recipesDisplayed
+      this.previousRecipesDisplayed = [...this.recipesDisplayed];
+    } else if (searchTerm.length <= 2) {
+      this.previousRecipesDisplayed = [...this.recipesDisplayed];
+
+      // If there are previous recipes displayed, revert to them
+      if (this.previousRecipesDisplayed.length > 0) {
+        this.recipesDisplayed = [...this.previousRecipesDisplayed];
+      }
+    }
+    this.notifyObservers();
   }
 }
