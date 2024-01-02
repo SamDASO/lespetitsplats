@@ -13,6 +13,7 @@ export class FilterComponent implements Component {
   private dropdownUl: HTMLUListElement;
   private dropdownContent: HTMLDivElement;
   private selectionFilters: HTMLDivElement;
+  private inputForm: HTMLInputElement;
 
   constructor(state: FiltersState, option: string) {
     this.option = option;
@@ -20,6 +21,7 @@ export class FilterComponent implements Component {
     this.dropdownUl = document.createElement("ul");
     this.dropdownContent = document.createElement("div");
     this.selectionFilters = document.createElement("div");
+    this.inputForm = document.createElement("input");
   }
 
   render(): HTMLElement {
@@ -85,11 +87,11 @@ export class FilterComponent implements Component {
     formFilter.classList.add("dropdown-search");
     formFilter.id = `dropdown-search-${this.option}`;
 
-    const inputForm = document.createElement("input");
-    inputForm.id = "dropdown-input";
-    inputForm.setAttribute("type", "text");
-    inputForm.setAttribute("name", "search");
-    inputForm.setAttribute("placeholder", "");
+    this.inputForm.classList.add("dropdown-input");
+    this.inputForm.id = `dropdown-input-${this.option}`;
+    this.inputForm.setAttribute("type", "text");
+    this.inputForm.setAttribute("name", "search");
+    this.inputForm.setAttribute("placeholder", "");
 
     const btnForm = document.createElement("button");
     btnForm.id = "dropdown-btn";
@@ -97,7 +99,7 @@ export class FilterComponent implements Component {
     imgBtnContent.setAttribute("src", "./assets/icons/search-filter.svg");
 
     btnForm.appendChild(imgBtnContent);
-    formFilter.appendChild(inputForm);
+    formFilter.appendChild(this.inputForm);
     formFilter.appendChild(btnForm);
 
     this.dropdownContent.appendChild(formFilter);
@@ -142,6 +144,30 @@ export class FilterComponent implements Component {
     );
 
     sortedAvailableFilters.forEach((filter: string) => {
+      this.dropdownUl.appendChild(this.createHtmlListFilter(filter, false));
+    });
+
+    // Search by option
+    this.inputForm.addEventListener("input", () =>
+      this.filterAvailableFilters(this.inputForm.value)
+    );
+
+    // List items - available Filters
+  }
+
+  private filterAvailableFilters(searchTerm: string) {
+    const availableFiltersSet =
+      this.state.getFilters().availableFilters[this.option];
+
+    const filteredFilters = [...availableFiltersSet]
+      .filter((filter) =>
+        filter.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => a.localeCompare(b));
+
+    this.dropdownUl.innerHTML = ""; // Clear the existing list
+
+    filteredFilters.forEach((filter: string) => {
       this.dropdownUl.appendChild(this.createHtmlListFilter(filter, false));
     });
   }

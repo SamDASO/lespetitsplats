@@ -1,9 +1,10 @@
 ///////////////////////////////////IMPORTS
 
-import { FiltersComponent } from "./components/filtersComponent.ts";
+import { FiltersContainer } from "./components/filtersContainer.ts";
 import { FiltersState } from "./state/filtersState.ts";
 import { RecipesState } from "./state/recipesState.ts";
 import { Recipe } from "./models/recipe.ts";
+import { RecipesContainer } from "./components/recipesContainer.ts";
 
 ///////////////////////////////////DATAS
 
@@ -25,19 +26,21 @@ function init(recipesData: Recipe[]) {
   //state initialisation
   const recipesState = new RecipesState([], recipes);
   const filtersState = new FiltersState(recipesState);
+  const recipesContainer = new RecipesContainer(recipesState);
 
   // Component initialization
 
-  const filtersComponent = new FiltersComponent(filtersState, recipesState);
+  const filtersContainer = new FiltersContainer(filtersState, recipesState);
 
   //observers
-  recipesState.addObserver(filtersComponent);
+  recipesState.addObserver(filtersContainer);
   recipesState.addObserver(filtersState);
-  filtersState.addObserver(filtersComponent);
+  recipesState.addObserver(recipesContainer);
+  filtersState.addObserver(filtersContainer);
 
   // Display initial content
   recipesState.notifyObservers();
-  filtersComponent.render();
+  filtersContainer.render();
 
   // display initialisation
   recipesState.updateRecipes(filtersState.getFilters().selectedFilters);

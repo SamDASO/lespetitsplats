@@ -1,4 +1,4 @@
-import { RecipeComponent } from "../components/recipeComponent.ts";
+import { Filters } from "../models/filters.ts";
 import { IObservable, IObserver } from "../models/observer-interfaces.ts";
 import { Recipe } from "../models/recipe.ts";
 export class RecipesState implements IObservable {
@@ -29,7 +29,7 @@ export class RecipesState implements IObservable {
 
   //needs to sort its recipes depending on each filters selected received
 
-  public updateRecipes(selectedFilters: any) {
+  public updateRecipes(selectedFilters: Filters) {
     // Filter recipes based on selected filters
     this.recipesDisplayed = this.allRecipes.filter((recipe) => {
       const ingredientsMatch = this.matchIngredients(
@@ -47,21 +47,7 @@ export class RecipesState implements IObservable {
 
       return ingredientsMatch && appliancesMatch && ustensilsMatch;
     });
-    console.log("updates recipes after toggle:", this.recipesDisplayed);
 
-    //update recipeComponent with the new recipesDisplayed array
-    const containerElement = document.getElementById("recipes-section");
-    containerElement!.innerHTML = "";
-    const recipesComponents: RecipeComponent[] = this.recipesDisplayed.map(
-      (recipe) => new RecipeComponent(recipe)
-    );
-    recipesComponents.forEach((component) => {
-      component.render();
-    });
-
-    recipesComponents.forEach((component) => {
-      containerElement?.appendChild(component.render());
-    });
     this.notifyObservers();
   }
 
