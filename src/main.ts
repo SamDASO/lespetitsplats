@@ -44,14 +44,6 @@ function init(recipesData: Recipe[]) {
 
   // display initialisation
   recipesState.updateRecipes(filtersState.getFilters().selectedFilters);
-
-  //Search Bar
-  const searchInput = document.getElementById(
-    "search-input-main"
-  ) as HTMLInputElement;
-  searchInput!.addEventListener("input", () =>
-    recipesState.matchText(searchInput!.value)
-  );
 }
 
 fetchDataAndInit();
