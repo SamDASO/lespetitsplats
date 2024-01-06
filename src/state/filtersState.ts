@@ -43,13 +43,13 @@ export class FiltersState implements IObservable, IObserver {
   }
 
   notifyObservers(): void {
-    this.observers.forEach((observer) => {
-      observer.update();
-    });
     this.recipesState.updateRecipes(
       this.filters.selectedFilters,
       this.filters.filterText
     );
+    this.observers.forEach((observer) => {
+      observer.update();
+    });
   }
 
   private generateFilters() {
@@ -104,13 +104,6 @@ export class FiltersState implements IObservable, IObserver {
     this.filters.availableFilters[option].delete(filterText);
     this.filters.selectedFilters[option].add(filterText);
 
-    console.log(
-      "option on clickhandler available filters",
-      option,
-      "filters list after clicking an available filter",
-      this.filters
-    );
-
     return this.filters;
   }
 
@@ -122,20 +115,13 @@ export class FiltersState implements IObservable, IObserver {
     this.filters.selectedFilters[option].delete(filterText);
     this.filters.availableFilters[option].add(filterText);
 
-    console.log(
-      "option on clickhandler selected filters",
-      option,
-      "filters list after clicking a selected filter",
-      this.filters
-    );
     return this.filters;
   }
 
   public searchFilterText(filterText: string) {
-    if (this.filters.filterText.length < 3) {
+    if (filterText.length < 3) {
       return;
     }
-
     this.filters.filterText = filterText;
     this.notifyObservers();
   }

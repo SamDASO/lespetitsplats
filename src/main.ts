@@ -53,9 +53,9 @@ function init(recipesData: Recipe[]) {
     "search-input-main"
   ) as HTMLInputElement;
 
-  searchInput.addEventListener("input", () =>
-    filtersState.searchFilterText(searchInput.value)
-  );
+  searchInput.addEventListener("input", () => {
+    filtersState.searchFilterText(searchInput.value);
+  });
 }
 
 fetchDataAndInit();

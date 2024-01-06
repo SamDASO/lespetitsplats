@@ -126,10 +126,6 @@ export class FilterComponent implements Component {
       this.state.getFilters().selectedFilters[this.option];
     const availableFiltersSet =
       this.state.getFilters().availableFilters[this.option];
-    console.log(
-      "filters their state in the renderFiltersList from fC",
-      this.state.getFilters()
-    );
 
     // List items - selected Filters
     selectedFilters.forEach((filter: string) => {

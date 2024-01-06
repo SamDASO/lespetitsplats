@@ -31,7 +31,5 @@ export class RecipesContainer implements Component, IObserver {
 
   update(): void {
     this.render();
-    console.log("update for the recipesContainer in the recipes-section");
-    console.log;
   }
 }
