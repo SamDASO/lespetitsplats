@@ -27,9 +27,7 @@ export class RecipesState implements IObservable {
     this.observers.forEach((observer) => observer.update());
   }
 
-  //needs to sort its recipes depending on each filters selected received
-
-  public updateRecipes(selectedFilters: Filters) {
+  public updateRecipes(selectedFilters: Filters, searchText: string) {
     // Filter recipes based on selected filters
     this.recipesDisplayed = this.allRecipes.filter((recipe) => {
       const ingredientsMatch = this.matchIngredients(
@@ -45,7 +43,9 @@ export class RecipesState implements IObservable {
         selectedFilters.ustensils
       );
 
-      return ingredientsMatch && appliancesMatch && ustensilsMatch;
+      const textMatch = this.matchText(recipe, searchText);
+
+      return ingredientsMatch && appliancesMatch && ustensilsMatch && textMatch;
     });
 
     this.notifyObservers();
@@ -98,5 +98,21 @@ export class RecipesState implements IObservable {
     return Array.from(filterUstensils).every((filter) =>
       recipeUstensilSet.has(filter)
     );
+  }
+
+  private matchText(recipe: Recipe, searchTerm: string): boolean {
+    if (searchTerm.length < 3) {
+      return true;
+    }
+    searchTerm = searchTerm.toLowerCase();
+    const nameMatch = recipe.name.toLowerCase().includes(searchTerm);
+    const descriptionMatch = recipe.description
+      .toLowerCase()
+      .includes(searchTerm);
+    const ingredientMatch = recipe.ingredients.some((ingredient) =>
+      ingredient.ingredient.toLowerCase().includes(searchTerm)
+    );
+
+    return nameMatch || descriptionMatch || ingredientMatch;
   }
 }

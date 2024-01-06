@@ -7,6 +7,7 @@ export class FiltersState implements IObservable, IObserver {
   private filters: {
     availableFilters: Filters;
     selectedFilters: Filters;
+    filterText: string;
   };
   private recipesState: RecipesState;
 
@@ -22,6 +23,7 @@ export class FiltersState implements IObservable, IObserver {
         appliances: new Set(),
         ustensils: new Set(),
       },
+      filterText: "",
     };
     this.recipesState = recipesState;
   }
@@ -44,7 +46,10 @@ export class FiltersState implements IObservable, IObserver {
     this.observers.forEach((observer) => {
       observer.update();
     });
-    this.recipesState.updateRecipes(this.filters.selectedFilters);
+    this.recipesState.updateRecipes(
+      this.filters.selectedFilters,
+      this.filters.filterText
+    );
   }
 
   private generateFilters() {
@@ -85,7 +90,10 @@ export class FiltersState implements IObservable, IObserver {
     } else if (this.filters.selectedFilters[option].has(filterText)) {
       this.clickHandlerSelectedFilters(filterText, option);
     }
-    this.recipesState.updateRecipes(this.filters.selectedFilters);
+    this.recipesState.updateRecipes(
+      this.filters.selectedFilters,
+      this.filters.filterText
+    );
     this.notifyObservers();
   }
 
@@ -121,5 +129,14 @@ export class FiltersState implements IObservable, IObserver {
       this.filters
     );
     return this.filters;
+  }
+
+  public searchFilterText(filterText: string) {
+    if (this.filters.filterText.length < 3) {
+      return;
+    }
+
+    this.filters.filterText = filterText;
+    this.notifyObservers();
   }
 }

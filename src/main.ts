@@ -43,7 +43,19 @@ function init(recipesData: Recipe[]) {
   filtersContainer.render();
 
   // display initialisation
-  recipesState.updateRecipes(filtersState.getFilters().selectedFilters);
+  recipesState.updateRecipes(
+    filtersState.getFilters().selectedFilters,
+    filtersState.getFilters().filterText
+  );
+
+  //Search Bar
+  const searchInput = document.getElementById(
+    "search-input-main"
+  ) as HTMLInputElement;
+
+  searchInput.addEventListener("input", () =>
+    filtersState.searchFilterText(searchInput.value)
+  );
 }
 
 fetchDataAndInit();

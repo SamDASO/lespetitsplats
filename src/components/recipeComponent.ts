@@ -44,7 +44,7 @@ export class RecipeComponent implements Component {
 
     const timeDuration = document.createElement("span");
     timeDuration.classList.add("time-duration");
-    timeDuration.textContent = time.toString() + `mins`;
+    timeDuration.textContent = time.toString() + `min`;
 
     cardRecipe.appendChild(linkRecipe);
     linkRecipe.appendChild(imgRecipe);
@@ -93,23 +93,14 @@ export class RecipeComponent implements Component {
 
     ingredientDiv.appendChild(ingredientName);
 
-    const ingredientQuantityAndUnit = document.createElement("div");
+    const ingredientQuantityAndUnit = document.createElement("p");
     ingredientQuantityAndUnit.classList.add("ingredient-quantity-unit");
 
-    if (ingredient.quantity) {
-      const ingredientQuantity = document.createElement("p");
-      ingredientQuantity.classList.add("ingredient-quantity");
-      ingredientQuantity.textContent = String(ingredient.quantity);
-
-      ingredientQuantityAndUnit.appendChild(ingredientQuantity);
-    }
+    if (ingredient.quantity)
+      ingredientQuantityAndUnit.textContent = String(ingredient.quantity);
 
     if (ingredient.unit) {
-      const ingredientUnit = document.createElement("p");
-      ingredientUnit.classList.add("ingredient-unit");
-      ingredientUnit.textContent = ingredient.unit!;
-
-      ingredientQuantityAndUnit.appendChild(ingredientUnit);
+      ingredientQuantityAndUnit.textContent += " " + ingredient.unit!;
     }
 
     ingredientDiv.appendChild(ingredientQuantityAndUnit);
