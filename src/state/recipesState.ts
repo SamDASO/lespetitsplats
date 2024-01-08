@@ -28,27 +28,24 @@ export class RecipesState implements IObservable {
   }
 
   public updateRecipes(selectedFilters: Filters, searchText: string) {
-    // Filter recipes based on selected filters
-    this.recipesDisplayed = this.allRecipes.filter((recipe) => {
-      const ingredientsMatch = this.matchIngredients(
-        recipe.ingredients,
-        selectedFilters.ingredients
-      );
-      const appliancesMatch = this.matchAppliances(
-        recipe.appliance,
-        selectedFilters.appliances
-      );
-      const ustensilsMatch = this.matchUstensils(
-        recipe.ustensils,
-        selectedFilters.ustensils
-      );
+    this.recipesDisplayed = [];
 
-      const textMatch = this.matchText(recipe, searchText);
+    for (let i = 0; i < this.allRecipes.length; i++) {
+      const recipe = this.allRecipes[i];
 
-      return ingredientsMatch && appliancesMatch && ustensilsMatch && textMatch;
-    });
-
-    this.notifyObservers();
+      if (
+        this.matchIngredients(
+          recipe.ingredients,
+          selectedFilters.ingredients
+        ) &&
+        this.matchAppliances(recipe.appliance, selectedFilters.appliances) &&
+        this.matchUstensils(recipe.ustensils, selectedFilters.ustensils) &&
+        this.matchText(recipe, searchText)
+      ) {
+        this.recipesDisplayed.push(recipe);
+        this.notifyObservers();
+      }
+    }
   }
 
   private matchIngredients(
