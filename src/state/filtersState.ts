@@ -119,7 +119,7 @@ export class FiltersState implements IObservable, IObserver {
   }
 
   public searchFilterText(filterText: string) {
-    if (filterText.length < 3) {
+    if (filterText.length < 3 && !this.filters.filterText) {
       return;
     }
     this.filters.filterText = filterText;
