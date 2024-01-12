@@ -26,7 +26,7 @@ function init(recipesData: Recipe[]) {
   //state initialisation
   const recipesState = new RecipesState([], recipes);
   const filtersState = new FiltersState(recipesState);
-  const recipesContainer = new RecipesContainer(recipesState);
+  const recipesContainer = new RecipesContainer(recipesState, filtersState);
 
   // Component initialization
 

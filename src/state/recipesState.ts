@@ -46,6 +46,10 @@ export class RecipesState implements IObservable {
         this.notifyObservers();
       }
     }
+
+    if (this.recipesDisplayed.length === 0) {
+      this.notifyObservers();
+    }
   }
 
   private matchIngredients(
