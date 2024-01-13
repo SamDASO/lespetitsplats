@@ -10,7 +10,7 @@ const filterLabels = new Map<string, string>([
 export class FilterComponent implements Component {
   private option: string;
   private state: FiltersState;
-  private dropdownUl: HTMLUListElement;
+  private dropdownDivList: HTMLDivElement;
   private dropdownContent: HTMLDivElement;
   private selectionFilters: HTMLDivElement;
   private inputForm: HTMLInputElement;
@@ -18,7 +18,7 @@ export class FilterComponent implements Component {
   constructor(state: FiltersState, option: string) {
     this.option = option;
     this.state = state;
-    this.dropdownUl = document.createElement("ul");
+    this.dropdownDivList = document.createElement("div");
     this.dropdownContent = document.createElement("div");
     this.selectionFilters = document.createElement("div");
     this.inputForm = document.createElement("input");
@@ -27,7 +27,7 @@ export class FilterComponent implements Component {
   render(): HTMLElement {
     //////////////////button
 
-    const btnOption = document.createElement("button");
+    const btnOption = document.createElement("div");
     btnOption.classList.add("filters-btn");
     btnOption.id = `filters-btn-${this.option}`;
     btnOption.setAttribute("aria-haspopup", "listbox");
@@ -79,8 +79,8 @@ export class FilterComponent implements Component {
     this.dropdownContent.classList.add("dropdown-content");
     this.dropdownContent.id = `dropdown-content-${this.option}`;
 
-    this.dropdownUl.classList.add("dropdown-ul");
-    this.dropdownUl.id = `dropdown-ul-${this.option}`;
+    this.dropdownDivList.classList.add("dropdown-divList");
+    this.dropdownDivList.id = `dropdown-ul-${this.option}`;
 
     // Search bar
     const formFilter = document.createElement("form");
@@ -94,9 +94,10 @@ export class FilterComponent implements Component {
     this.inputForm.setAttribute("placeholder", "");
 
     const btnForm = document.createElement("button");
-    btnForm.id = "dropdown-btn";
+    btnForm.classList.add("dropdown-btn");
     const imgBtnContent = document.createElement("img");
     imgBtnContent.setAttribute("src", "./assets/icons/search-filter.svg");
+    imgBtnContent.setAttribute("alt", "research button");
 
     btnForm.appendChild(imgBtnContent);
     formFilter.appendChild(this.inputForm);
@@ -111,7 +112,7 @@ export class FilterComponent implements Component {
     this.dropdownContent.appendChild(this.selectionFilters);
 
     //dropdownList
-    this.dropdownContent.appendChild(this.dropdownUl);
+    this.dropdownContent.appendChild(this.dropdownDivList);
 
     this.renderFiltersList();
 
@@ -119,7 +120,7 @@ export class FilterComponent implements Component {
   }
 
   public renderFiltersList() {
-    this.dropdownUl.innerHTML = "";
+    this.dropdownDivList.innerHTML = "";
     this.selectionFilters.innerHTML = "";
 
     const selectedFilters =
@@ -140,7 +141,9 @@ export class FilterComponent implements Component {
     );
 
     sortedAvailableFilters.forEach((filter: string) => {
-      this.dropdownUl.appendChild(this.createHtmlListFilter(filter, false));
+      this.dropdownDivList.appendChild(
+        this.createHtmlListFilter(filter, false)
+      );
     });
 
     // Search by option
@@ -161,18 +164,20 @@ export class FilterComponent implements Component {
       )
       .sort((a, b) => a.localeCompare(b));
 
-    this.dropdownUl.innerHTML = ""; // Clear the existing list
+    this.dropdownDivList.innerHTML = ""; // Clear the existing list
 
     filteredFilters.forEach((filter: string) => {
-      this.dropdownUl.appendChild(this.createHtmlListFilter(filter, false));
+      this.dropdownDivList.appendChild(
+        this.createHtmlListFilter(filter, false)
+      );
     });
   }
 
   private createHtmlListFilter(
     filter: string,
     isSelected: boolean
-  ): HTMLLIElement {
-    const filterElement = document.createElement("li");
+  ): HTMLParagraphElement {
+    const filterElement = document.createElement("p");
     filterElement.classList.add("filtered-element-list");
     filterElement.classList.add(`filtered-element-${this.option}`);
     filterElement.textContent = filter;
@@ -187,6 +192,7 @@ export class FilterComponent implements Component {
       const elementText = filter?.replace(/\s+/g, "").toLowerCase();
 
       closeCross.setAttribute("src", "assets/icons/cross.svg");
+      closeCross.setAttribute("alt", "close");
       closeCross.classList.add("close-element", `close-element-${elementText}`);
 
       filterElement.appendChild(closeCross);

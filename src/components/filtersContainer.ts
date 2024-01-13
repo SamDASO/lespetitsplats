@@ -130,6 +130,7 @@ export class FiltersContainer implements Component, IObserver, IObservable {
     const crossSVG = document.createElement("img");
     crossSVG.classList.add("close-selection");
     crossSVG.setAttribute("src", "../assets/icons/simple-cross.svg");
+    crossSVG.setAttribute("alt", "close");
 
     filterBox.appendChild(filterText);
     filterBox.appendChild(crossSVG);

@@ -26,6 +26,7 @@ export class RecipeComponent implements Component {
     const imgRecipe = document.createElement("img");
     imgRecipe.classList.add("img-recipes");
     imgRecipe.setAttribute("src", `./assets/recipes/${image}`);
+    imgRecipe.setAttribute("alt", name);
 
     const titleRecipe = document.createElement("h2");
     titleRecipe.classList.add("title-recipes");
